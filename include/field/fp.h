@@ -7,8 +7,10 @@
 #include <span>
 
 class Fp {
-private:
+public:
     static constexpr int32_t WIDTH = 6;
+
+private:
     uint64_t data[WIDTH];
 
 public:
@@ -20,6 +22,7 @@ public:
     static Fp one();
     static Fp random();
     static Fp montgomery_reduce(std::span<uint64_t> ts);
+    static Fp sum_of_products(std::span<Fp> a, std::span<Fp> b);
     static std::optional<Fp> from_bytes(std::span<uint8_t> bytes);
 
     [[nodiscard]] bool is_zero() const;
@@ -34,9 +37,8 @@ public:
     [[nodiscard]] std::optional<Fp> sqrt() const;
     [[nodiscard]] std::optional<Fp> invert() const;
 
-public:
-    template<uint32_t N>
-    Fp static sum_of_products(std::span<Fp> a, std::span<Fp> b);
+private:
+    static Fp reduce(std::span<uint64_t> limbs);
 
 public:
     Fp &operator=(const Fp &rhs);
@@ -54,8 +56,6 @@ public:
     friend inline bool operator==(const Fp &a, const Fp &b) { return std::memcmp(a.data, b.data, sizeof(a.data)) == 0; }
     friend inline bool operator!=(const Fp &a, const Fp &b) { return std::memcmp(a.data, b.data, sizeof(a.data)) != 0; }
 
-private:
-    static Fp reduce(std::span<uint64_t> limbs);
 };
 
 #endif //BLS12_381_FP_H

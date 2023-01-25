@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
+#include <span>
 #include "utils/arith.h"
+#include "utils/bit.h"
 
 TEST(TestUtil, BytesToUint64BE) {
     uint64_t expected = 0x0001020304050607;
-    const uint8_t array[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    uint8_t array[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     uint64_t result = be_bytes_to_uint64(array);
 
     EXPECT_EQ(result, expected);
