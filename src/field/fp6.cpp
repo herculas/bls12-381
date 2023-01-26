@@ -78,20 +78,20 @@ Fp6 Fp6::mul_interleaved(const Fp6 b) const {
     Fp b20_p_b21 = b.c2.getC0() + b.c2.getC1();
     Fp b20_m_b21 = b.c2.getC0() - b.c2.getC1();
 
-    std::vector<Fp> c000 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    std::vector<Fp> c001 = {b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11};
-    std::vector<Fp> c010 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    std::vector<Fp> c011 = {b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21, b10_p_b11, b10_m_b11};
+    auto c000 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    auto c001 = {b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11};
+    auto c010 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    auto c011 = {b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21, b10_p_b11, b10_m_b11};
 
-    std::vector<Fp> c100 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    std::vector<Fp> c101 = {b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21};
-    std::vector<Fp> c110 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    std::vector<Fp> c111 = {b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21};
+    auto c100 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    auto c101 = {b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21};
+    auto c110 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    auto c111 = {b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21};
 
-    std::vector<Fp> c200 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    std::vector<Fp> c201 = {b.c2.getC0(), b.c2.getC1(), b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1()};
-    std::vector<Fp> c210 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    std::vector<Fp> c211 = {b.c2.getC1(), b.c2.getC0(), b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0()};
+    auto c200 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    auto c201 = {b.c2.getC0(), b.c2.getC1(), b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1()};
+    auto c210 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    auto c211 = {b.c2.getC1(), b.c2.getC0(), b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0()};
 
     return Fp6{
             Fp2{

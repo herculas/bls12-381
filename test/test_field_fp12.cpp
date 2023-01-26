@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "field/fp12.h"
 
-TEST(TestFp12, Fp12Arithmetic) {
+TEST(TestFp12, Arithmetic) {
     Fp12 a{
             Fp6{
                     Fp2{

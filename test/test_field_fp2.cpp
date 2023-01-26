@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "field/fp2.h"
 
-TEST(TestFp2, Fp2Equality) {
+TEST(TestFp2, Equality) {
     Fp2 a{
             Fp({1, 2, 3, 4, 5, 6}),
             Fp({7, 8, 9, 10, 11, 12})
@@ -13,7 +13,7 @@ TEST(TestFp2, Fp2Equality) {
     EXPECT_TRUE(a == b);
 }
 
-TEST(TestFp2, Fp2Add) {
+TEST(TestFp2, Add) {
     Fp2 a{
             Fp({
                        0xc9a2183163ee70d4, 0xbc3770a7196b5c91, 0xa247f8c1304c5f44,
@@ -47,7 +47,7 @@ TEST(TestFp2, Fp2Add) {
     EXPECT_EQ(a + b, c);
 }
 
-TEST(TestFp2, Fp2Sub) {
+TEST(TestFp2, Sub) {
     Fp2 a{
             Fp({
                        0xc9a2183163ee70d4, 0xbc3770a7196b5c91, 0xa247f8c1304c5f44,
@@ -81,7 +81,7 @@ TEST(TestFp2, Fp2Sub) {
     EXPECT_EQ(a - b, c);
 }
 
-TEST(TestFp2, Fp2Neg) {
+TEST(TestFp2, Neg) {
     Fp2 a{
             Fp({
                        0xc9a2183163ee70d4, 0xbc3770a7196b5c91, 0xa247f8c1304c5f44,
@@ -105,7 +105,7 @@ TEST(TestFp2, Fp2Neg) {
     EXPECT_EQ(-a, b);
 }
 
-TEST(TestFp2, Fp2Mul) {
+TEST(TestFp2, Mul) {
     Fp2 a{
             Fp({
                        0xc9a2183163ee70d4, 0xbc3770a7196b5c91, 0xa247f8c1304c5f44,
@@ -139,7 +139,7 @@ TEST(TestFp2, Fp2Mul) {
     EXPECT_EQ(a * b, c);
 }
 
-TEST(TestFp2, Fp2Square) {
+TEST(TestFp2, Square) {
     Fp2 a{
             Fp({
                        0xc9a2183163ee70d4, 0xbc3770a7196b5c91, 0xa247f8c1304c5f44,
@@ -163,7 +163,7 @@ TEST(TestFp2, Fp2Square) {
     EXPECT_EQ(a.square(), b);
 }
 
-TEST(TestFp2, Fp2Sqrt) {
+TEST(TestFp2, Sqrt) {
     Fp2 a{
             Fp({
                        0x2beed14627d7f9e9, 0xb6614e06660e5dce, 0x06c4cc7c2f91d42c,
@@ -207,7 +207,7 @@ TEST(TestFp2, Fp2Sqrt) {
     EXPECT_FALSE(d.sqrt().has_value());
 }
 
-TEST(TestFp2, Fp2Inv) {
+TEST(TestFp2, Inv) {
     Fp2 a{
             Fp({
                        0x1128ecad67549455, 0x9e7a1cff3a4ea1a8, 0xeb208d51e08bcf27,
@@ -232,7 +232,7 @@ TEST(TestFp2, Fp2Inv) {
     EXPECT_FALSE(Fp2::zero().invert().has_value());
 }
 
-TEST(TestFp2, Fp2Lexical) {
+TEST(TestFp2, Lexical) {
     EXPECT_FALSE(Fp2::zero().lexicographically_largest());
     EXPECT_FALSE(Fp2::one().lexicographically_largest());
 

@@ -5,13 +5,11 @@
 G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}
 
 G1Affine::G1Affine(const G1Projective point) : x{Fp::zero()}, y{Fp::one()}, infinity{true} {
-    std::optional<Fp> z_inv = point.getZ().invert();
-    if (!z_inv.has_value()) {
-        return;
-    } else {
-        this->x = point.getX() * z_inv.value();
-        this->y = point.getY() * z_inv.value();
-    }
+    Fp z_inv = point.getZ().invert().value_or(Fp::zero());
+    Fp rx = point.getX() * z_inv;
+    Fp ry = point.getY() * z_inv;
+    G1Affine temp{rx, ry, false};
+    if (!z_inv.is_zero()) *this = temp;
 }
 
 G1Affine::G1Affine(const Fp x, const Fp y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
@@ -62,7 +60,7 @@ std::optional<G1Affine> G1Affine::from_compressed_unchecked(const std::array<uin
     if (!sy.has_value()) return std::nullopt;
 
     Fp y_cord = sy.value();
-    if (!(y_cord.lexicographically_largest() ^ sort_flat_set)) y_cord = -y_cord;
+    if (y_cord.lexicographically_largest() ^ sort_flat_set) y_cord = -y_cord;
 
     if (infinity_flat_set || (!compression_flag_set)) return std::nullopt;
     return G1Affine{
@@ -109,9 +107,9 @@ std::optional<G1Affine> G1Affine::from_uncompressed_unchecked(const std::array<u
             infinity_flat_set,
     };
     if (infinity_flat_set) {
-        return res;
-    } else {
         return G1Affine::identity();
+    } else {
+        return res;
     }
 }
 
@@ -139,31 +137,25 @@ bool G1Affine::is_torsion_free() const {
 }
 
 std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> G1Affine::to_compressed() const {
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes{};
-
-    if (this->infinity)
-        bytes = this->x.to_bytes();
-    else
-        bytes = Fp::zero().to_bytes();
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes = (this->infinity ? Fp::zero() : this->x).to_bytes();
 
     bytes[0] |= (static_cast<uint8_t>(1) << 7);                                                                         // compression flag
-    bytes[0] |= (this->infinity ? static_cast<uint8_t>(0) : (static_cast<uint8_t>(1) << 6));                            // infinity flag
-    bytes[0] |= (((!this->infinity) && this->y.lexicographically_largest()) ? static_cast<uint8_t>(0) : (               // sort flag
-            static_cast<uint8_t>(1) << 5));
-
+    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6) : static_cast<uint8_t>(0));                            // infinity flag
+    bytes[0] |= (((!this->infinity) && this->y.lexicographically_largest()) ? (static_cast<uint8_t>(1) << 5)            // sort flag
+                                                                            : static_cast<uint8_t>(0));
     return bytes;
 }
 
 std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> G1Affine::to_uncompressed() const {
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> bytes{};
 
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> x_bytes = (this->infinity ? this->x : Fp::zero()).to_bytes();
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> y_bytes = (this->infinity ? this->y : Fp::zero()).to_bytes();
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> x_bytes = (this->infinity ? Fp::zero() : this->x).to_bytes();
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> y_bytes = (this->infinity ?   Fp::zero():this->y).to_bytes();
 
     std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin());
     std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + Fp::WIDTH * sizeof(uint64_t));
 
-    bytes[0] |= (this->infinity ? static_cast<uint8_t>(0) : (static_cast<uint8_t>(1) << 6));                            // infinity flag
+    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6) : static_cast<uint8_t>(0));                            // infinity flag
 
     return bytes;
 }
@@ -185,7 +177,7 @@ G1Affine &G1Affine::operator=(const G1Affine &rhs) {
 G1Affine G1Affine::operator-() const {
     return G1Affine{
             this->x,
-            this->infinity ? (-this->y) : Fp::one(),
+            this->infinity ? Fp::one() : (-this->y),
             this->infinity,
     };
 }

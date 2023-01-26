@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "field/fp.h"
 
-TEST(TestFp, FpMul) {
+TEST(TestFp, Mul) {
     Fp a({
                  0x0397a38320170cd4, 0x734c1b2c9e761d30, 0x5ed255ad9a48beb5,
                  0x095a3c6b22a7fcfc, 0x2294ce75d4e26a27, 0x13338bd870011ebb,
@@ -18,7 +18,7 @@ TEST(TestFp, FpMul) {
     EXPECT_EQ(a *= b, c);
 }
 
-TEST(TestFp, FpFromBytes) {
+TEST(TestFp, FromBytes) {
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> array1 = {
             26, 1, 17, 234, 57, 127, 230, 154,
             75, 27, 167, 182, 67, 75, 172, 215,
@@ -45,7 +45,7 @@ TEST(TestFp, FpFromBytes) {
     EXPECT_FALSE(c.has_value());
 }
 
-TEST(TestFp, FpToBytes) {
+TEST(TestFp, ToBytes) {
     Fp a({
                  0xdc906d9be3f95dc8, 0x8755caf7459691a1, 0xcff1a7f4e9583ab3,
                  0x9b43821f849e2284, 0xf57554f3a2974f3f, 0x085dbea84ed47f79,
@@ -62,7 +62,7 @@ TEST(TestFp, FpToBytes) {
     }
 }
 
-TEST(TestFp, FpSquare) {
+TEST(TestFp, Square) {
     Fp a({
                  0xd215d2768e83191b, 0x5085d80f8fb28261, 0xce9a032ddf393a56,
                  0x3e9c4fff2ca0c4bb, 0x6436b6f7f4d95dfb, 0x10606628ad4a4d90,
@@ -75,7 +75,7 @@ TEST(TestFp, FpSquare) {
     EXPECT_EQ(a.square(), b);
 }
 
-TEST(TestFp, FpSqrt) {
+TEST(TestFp, Sqrt) {
     // a = 4.
     Fp a({
                  0xaa270000000cfff3, 0x53cc0032fc34000a, 0x478fe97a6b0a807f,
@@ -92,7 +92,7 @@ TEST(TestFp, FpSqrt) {
     EXPECT_EQ(a.sqrt().value(), -b);
 }
 
-TEST(TestFp, FpInverse) {
+TEST(TestFp, Inverse) {
     Fp a({
                  0x43b43a5078ac2076, 0x1ce0763046f8962b, 0x724a5276486d735c,
                  0x6f05c2a6282d48fd, 0x2095bd5bb4ca9331, 0x03b35b3894b0f7da,
@@ -104,7 +104,7 @@ TEST(TestFp, FpInverse) {
     EXPECT_EQ(a.invert().value(), b);
 }
 
-TEST(TestFp, FpLexical) {
+TEST(TestFp, Lexical) {
     Fp a({
                  0xa1fafffffffe5557, 0x995bfff976a3fffe, 0x03f41d24d174ceb4,
                  0xf6547998c1995dbd, 0x778a468f507a6034, 0x020559931f7f8103
@@ -125,7 +125,7 @@ TEST(TestFp, FpLexical) {
     EXPECT_TRUE(c.lexicographically_largest());
 }
 
-TEST(TestFp, FpStr) {
+TEST(TestFp, Str) {
     Fp a({
                  0x5360bb5978678032, 0x7dd275ae799e128e, 0x5c5b5071ce4f4dcf,
                  0xcdb21f93078dbb3e, 0xc32365c5e73f474a, 0x115a2a5489babe5b,

@@ -6,7 +6,7 @@
 G1Projective::G1Projective() : x{Fp::zero()}, y{Fp::one()}, z{Fp::zero()} {}
 
 G1Projective::G1Projective(const G1Affine point) : x{point.getX()}, y{point.getY()},
-                                                   z{point.is_identity() ? Fp::one() : Fp::zero()} {}
+                                                   z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
 G1Projective::G1Projective(const Fp x, const Fp y, const Fp z) : x{x}, y{y}, z{z} {}
 
@@ -35,7 +35,7 @@ std::vector<G1Affine> G1Projective::batch_normalize(std::vector<G1Projective> po
     Fp acc = Fp::one();
     for (int i = 0; i < points.size(); ++i) {
         temp_xs[i] = acc;
-        acc = points[i].is_identity() ? (acc * points[i].z) : acc;
+        acc = points[i].is_identity() ? acc : (acc * points[i].z);
     }
 
     assert(acc.invert().has_value());
@@ -43,13 +43,13 @@ std::vector<G1Affine> G1Projective::batch_normalize(std::vector<G1Projective> po
 
     for (int i = static_cast<int32_t>(points.size()) - 1; i >= 0; --i) {
         Fp temp = temp_xs[i] * acc;
-        acc = points[i].is_identity() ? (acc * points[i].z) : acc;
+        acc = points[i].is_identity() ? acc : (acc * points[i].z);
         G1Affine r{
                 points[i].x * temp,
                 points[i].y * temp,
                 false,
         };
-        results[i] = points[i].is_identity() ? r : G1Affine::identity();
+        results[i] = points[i].is_identity() ? G1Affine::identity() : r;
     }
 
     return results;
@@ -104,7 +104,7 @@ G1Projective G1Projective::doubles() const {
     x3 = x3 + x3;
 
     G1Projective temp{x3, y3, z3};
-    return this->is_identity() ? temp : G1Projective::identity();
+    return this->is_identity() ? G1Projective::identity() : temp;
 }
 
 G1Projective G1Projective::add(const G1Projective &rhs) const {
@@ -174,7 +174,7 @@ G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
     z3 = z3 + t0;
 
     G1Projective temp{x3, y3, z3};
-    return rhs.is_identity() ? temp : *this;
+    return rhs.is_identity() ? *this : temp;
 }
 
 G1Projective G1Projective::multiply(std::array<uint8_t, 32> bytes) const {
@@ -184,7 +184,7 @@ G1Projective G1Projective::multiply(std::array<uint8_t, 32> bytes) const {
             if (iter == bytes.rbegin() && i == 7) continue;
             uint8_t bit = (*iter >> i) & static_cast<uint8_t>(1);
             acc = acc.doubles();
-            if (bit == 0) acc = acc + *this;
+            if (bit != 0) acc = acc + *this;
         }
     }
     return acc;
