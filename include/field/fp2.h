@@ -28,8 +28,8 @@ public:
     [[nodiscard]] Fp2 conjugate() const;
     [[nodiscard]] Fp2 frobenius_map() const;
     [[nodiscard]] Fp2 mul_by_non_residue() const;
-    [[nodiscard]] Fp2 pow_vartime(std::span<uint64_t> exp) const;
-    [[nodiscard]] Fp2 pow_vartime_extended(std::span<uint64_t> exp) const;
+    [[nodiscard]] Fp2 pow_vartime(std::array<uint64_t, Fp::WIDTH> exp) const;
+    [[nodiscard]] Fp2 pow_vartime_extended(std::vector<uint64_t> exp) const;
 
     [[nodiscard]] std::optional<Fp2> sqrt() const;
     [[nodiscard]] std::optional<Fp2> invert() const;

@@ -2,11 +2,11 @@
 
 Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp2 fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp2 fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp2 fp0, Fp2 fp1, Fp2 fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
+Fp6::Fp6(const Fp2 fp0, const Fp2 fp1, const Fp2 fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
 Fp6 Fp6::zero() {
     return Fp6{
@@ -52,7 +52,7 @@ Fp6 Fp6::square() const {
     };
 }
 
-Fp6 Fp6::mul_by_fp2(Fp2 fp) const {
+Fp6 Fp6::mul_by_fp2(const Fp2 fp) const {
     return Fp6{
             (this->c2 * fp).mul_by_non_residue(),
             this->c0 * fp,
@@ -60,7 +60,7 @@ Fp6 Fp6::mul_by_fp2(Fp2 fp) const {
     };
 }
 
-Fp6 Fp6::mul_by_fp2(Fp2 fp0, Fp2 fp1) const {
+Fp6 Fp6::mul_by_fp2(const Fp2 fp0, const Fp2 fp1) const {
     Fp2 a_a = this->c0 * fp0;
     Fp2 b_b = this->c1 * fp1;
 
@@ -71,27 +71,27 @@ Fp6 Fp6::mul_by_fp2(Fp2 fp0, Fp2 fp1) const {
     return Fp6{t1, t2, t3};
 }
 
-Fp6 Fp6::mul_interleaved(Fp6 b) const {
+Fp6 Fp6::mul_interleaved(const Fp6 b) const {
     Fp6 a = *this;
     Fp b10_p_b11 = b.c1.getC0() + b.c1.getC1();
     Fp b10_m_b11 = b.c1.getC0() - b.c1.getC1();
     Fp b20_p_b21 = b.c2.getC0() + b.c2.getC1();
     Fp b20_m_b21 = b.c2.getC0() - b.c2.getC1();
 
-    Fp c000[6] = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    Fp c001[6] = {b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11};
-    Fp c010[6] = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    Fp c011[6] = {b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21, b10_p_b11, b10_m_b11};
+    std::vector<Fp> c000 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    std::vector<Fp> c001 = {b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11};
+    std::vector<Fp> c010 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    std::vector<Fp> c011 = {b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21, b10_p_b11, b10_m_b11};
 
-    Fp c100[6] = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    Fp c101[6] = {b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21};
-    Fp c110[6] = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    Fp c111[6] = {b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21};
+    std::vector<Fp> c100 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    std::vector<Fp> c101 = {b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1(), b20_m_b21, b20_p_b21};
+    std::vector<Fp> c110 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    std::vector<Fp> c111 = {b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0(), b20_p_b21, b20_m_b21};
 
-    Fp c200[6] = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
-    Fp c201[6] = {b.c2.getC0(), b.c2.getC1(), b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1()};
-    Fp c210[6] = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
-    Fp c211[6] = {b.c2.getC1(), b.c2.getC0(), b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0()};
+    std::vector<Fp> c200 = {a.c0.getC0(), -a.c0.getC1(), a.c1.getC0(), -a.c1.getC1(), a.c2.getC0(), -a.c2.getC1()};
+    std::vector<Fp> c201 = {b.c2.getC0(), b.c2.getC1(), b.c1.getC0(), b.c1.getC1(), b.c0.getC0(), b.c0.getC1()};
+    std::vector<Fp> c210 = {a.c0.getC0(), a.c0.getC1(), a.c1.getC0(), a.c1.getC1(), a.c2.getC0(), a.c2.getC1()};
+    std::vector<Fp> c211 = {b.c2.getC1(), b.c2.getC0(), b.c1.getC1(), b.c1.getC0(), b.c0.getC1(), b.c0.getC0()};
 
     return Fp6{
             Fp2{

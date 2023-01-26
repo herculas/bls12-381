@@ -1,6 +1,6 @@
 #include "utils/encode.h"
 
-std::string hexStr(std::span<uint8_t> span) {
+std::string hexStr(const std::span<uint8_t> span) {
     std::string result;
     static constexpr char hexMap[16] = {
             '0', '1', '2', '3',

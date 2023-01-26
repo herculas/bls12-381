@@ -19,7 +19,7 @@ TEST(TestFp, FpMul) {
 }
 
 TEST(TestFp, FpFromBytes) {
-    uint8_t array1[48] = {
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> array1 = {
             26, 1, 17, 234, 57, 127, 230, 154,
             75, 27, 167, 182, 67, 75, 172, 215,
             100, 119, 75, 132, 243, 133, 18, 191,
@@ -28,7 +28,7 @@ TEST(TestFp, FpFromBytes) {
             185, 254, 255, 255, 255, 255, 170, 170
     };
 
-    uint8_t array2[48] = {
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> array2 = {
             27, 1, 17, 234, 57, 127, 230, 154,
             75, 27, 167, 182, 67, 75, 172, 215,
             100, 119, 75, 132, 243, 133, 18, 191,
@@ -51,12 +51,12 @@ TEST(TestFp, FpToBytes) {
                  0x9b43821f849e2284, 0xf57554f3a2974f3f, 0x085dbea84ed47f79,
          });
 
-    uint8_t bytes[48];
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes{};
     Fp b;
 
     for (int i = 0; i < 100; ++i) {
         a = a.square();
-        a.to_bytes(bytes);
+        bytes = a.to_bytes();
         b = Fp::from_bytes(bytes).value();
         EXPECT_EQ(a, b);
     }
