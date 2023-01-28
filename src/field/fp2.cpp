@@ -3,9 +3,11 @@
 
 Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
 
-Fp2::Fp2(const Fp fp) : c0{fp}, c1{Fp::zero()} {}
+Fp2::Fp2(Fp &&fp) : c0{fp}, c1{Fp::zero()} {}
+Fp2::Fp2(Fp &&fp0, Fp &&fp1) : c0{fp0}, c1{fp1} {}
 
-Fp2::Fp2(const Fp fp0, const Fp fp1) : c0{fp0}, c1{fp1} {}
+Fp2::Fp2(const Fp &fp) : c0{fp}, c1{Fp::zero()} {}
+Fp2::Fp2(const Fp &fp0, const Fp &fp1) : c0{fp0}, c1{fp1} {}
 
 Fp2 Fp2::zero() {
     return Fp2{
@@ -69,7 +71,7 @@ Fp2 Fp2::mul_by_non_residue() const {
     };
 }
 
-Fp2 Fp2::pow_vartime(const std::array<uint64_t, Fp::WIDTH> exp) const {
+Fp2 Fp2::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp2 res = Fp2::one();
     for (int i = Fp::WIDTH - 1; i >= 0; --i) {
         for (int j = 63; j >= 0; --j) {
@@ -82,8 +84,7 @@ Fp2 Fp2::pow_vartime(const std::array<uint64_t, Fp::WIDTH> exp) const {
     return res;
 }
 
-
-Fp2 Fp2::pow_vartime_extended(const std::vector<uint64_t> exp) const {
+Fp2 Fp2::pow_vartime_extended(const std::vector<uint64_t> &exp) const {
     auto len = static_cast<int32_t>(exp.size());
     Fp2 res = Fp2::one();
     for (int i = len - 1; i >= 0; --i) {

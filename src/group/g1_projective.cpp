@@ -2,13 +2,20 @@
 #include "group/g1_affine.h"
 #include "group/constant.h"
 #include "field/constant.h"
+#include "scalar/scalar.h"
+#include "utils/random.h"
 
 G1Projective::G1Projective() : x{Fp::zero()}, y{Fp::one()}, z{Fp::zero()} {}
 
-G1Projective::G1Projective(const G1Affine point) : x{point.getX()}, y{point.getY()},
-                                                   z{point.is_identity() ? Fp::zero() : Fp::one()} {}
+G1Projective::G1Projective(G1Affine &&point) : x{point.getX()}, y{point.getY()},
+                                               z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
-G1Projective::G1Projective(const Fp x, const Fp y, const Fp z) : x{x}, y{y}, z{z} {}
+G1Projective::G1Projective(Fp &&x, Fp &&y, Fp &&z) : x{x}, y{y}, z{z} {}
+
+G1Projective::G1Projective(const G1Affine &point) : x{point.getX()}, y{point.getY()},
+                                                    z{point.is_identity() ? Fp::zero() : Fp::one()} {}
+
+G1Projective::G1Projective(const Fp &x, const Fp &y, const Fp &z) : x{x}, y{y}, z{z} {}
 
 G1Projective G1Projective::identity() {
     return G1Projective{};
@@ -28,7 +35,21 @@ G1Projective G1Projective::generator() {
     };
 }
 
-std::vector<G1Affine> G1Projective::batch_normalize(std::vector<G1Projective> points) {
+G1Projective G1Projective::random() {
+    while (true) {
+        bool flip_sign = getRandom<uint8_t>() % 2 != 0;
+        Fp rx = Fp::random();
+        auto temp = (rx.square() * rx + B).sqrt();
+        if (!temp.has_value()) continue;
+        Fp ry = temp.value();
+        G1Affine point{rx, flip_sign ? -ry : ry, false};
+        G1Projective curve(point);
+        G1Projective res = curve.clear_cofactor();
+        if (!res.is_identity()) return res;
+    }
+}
+
+std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projective> &points) {
     std::vector<G1Affine> results(points.size());
     std::vector<Fp> temp_xs(points.size());
 
@@ -73,7 +94,8 @@ bool G1Projective::is_identity() const {
 
 bool G1Projective::is_on_curve() const {
     // y ^ 2 * z = x ^ 3 + b * z ^ 3.
-    return ((this->y.square() * this->z) == (this->x.square() * this->x + this->z.square() * this->z * B)) ||
+    return ((this->y.square() * this->z) ==
+            (this->x.square() * this->x + this->z.square() * this->z * B)) ||
            this->z.is_zero();
 }
 
@@ -177,7 +199,7 @@ G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
     return rhs.is_identity() ? *this : temp;
 }
 
-G1Projective G1Projective::multiply(std::array<uint8_t, 32> bytes) const {
+G1Projective G1Projective::multiply(const std::array<uint8_t, 32> &bytes) const {
     G1Projective acc = G1Projective::identity();
     for (auto iter = bytes.rbegin(); iter != bytes.rend(); ++iter) {
         for (int i = 7; i >= 0; --i) {
@@ -205,6 +227,14 @@ G1Projective G1Projective::mul_by_x() const {
 
 G1Projective G1Projective::clear_cofactor() const {
     return *this - this->mul_by_x();
+}
+
+G1Projective G1Projective::operator-() const {
+    return G1Projective{
+            this->x,
+            -this->y,
+            this->z,
+    };
 }
 
 G1Projective &G1Projective::operator=(const G1Projective &rhs) {
@@ -235,10 +265,7 @@ G1Projective &G1Projective::operator-=(const G1Affine &rhs) {
     return *this;
 }
 
-G1Projective G1Projective::operator-() const {
-    return G1Projective{
-            this->x,
-            -this->y,
-            this->z,
-    };
+G1Projective &G1Projective::operator*=(const Scalar &rhs) {
+    *this = this->multiply(rhs.to_bytes());
+    return *this;
 }

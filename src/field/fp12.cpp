@@ -2,13 +2,15 @@
 
 Fp12::Fp12() : c0{Fp6::zero()}, c1{Fp6::zero()} {}
 
-Fp12::Fp12(const Fp fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(Fp &&fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(Fp2 &&fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(Fp6 &&fp) : c0{fp}, c1{Fp6::zero()} {}
+Fp12::Fp12(Fp6 &&fp0, Fp6 &&fp1) : c0{fp0}, c1{fp1} {}
 
-Fp12::Fp12(const Fp2 fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
-
-Fp12::Fp12(const Fp6 fp) : c0{fp}, c1{Fp6::zero()} {}
-
-Fp12::Fp12(const Fp6 fp0, const Fp6 fp1) : c0{fp0}, c1{fp1} {}
+Fp12::Fp12(const Fp &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(const Fp2 &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(const Fp6 &fp) : c0{fp}, c1{Fp6::zero()} {}
+Fp12::Fp12(const Fp6 &fp0, const Fp6 &fp1) : c0{fp0}, c1{fp1} {}
 
 Fp12 Fp12::zero() {
     return Fp12{
@@ -70,7 +72,7 @@ Fp12 Fp12::frobenius_map() const {
     return Fp12{s0, s1 * temp};
 }
 
-Fp12 Fp12::mul_by_fp2(const Fp2 fp0, const Fp2 fp1, const Fp2 fp4) const {
+Fp12 Fp12::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp4) const {
     Fp6 aa = this->c0.mul_by_fp2(fp0, fp1);
     Fp6 bb = this->c1.mul_by_fp2(fp4);
 

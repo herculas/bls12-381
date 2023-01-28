@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "group/g1_affine.h"
-#include "group/g1_projective.h"
 #include "field/constant.h"
+#include "group/constant.h"
+#include "scalar/scalar.h"
 
 TEST(TestG1, Beta) {
     auto a = Fp::from_bytes({
@@ -305,6 +305,15 @@ TEST(TestG1, AffineNegSub) {
     EXPECT_EQ(G1Projective(a) +(-a), G1Projective(a) -a);
 }
 
+TEST(TestG1, AffineScalarMul) {
+    G1Affine gen = G1Affine::generator();
+    Scalar a = Scalar::from_raw({0x2b568297a56da71c, 0xd8c39ecb0ef375d1, 0x435c38da67bfbf96, 0x8088a05026b659b2});
+    Scalar b = Scalar::from_raw({0x785fdd9b26ef8b85, 0xc997f25837695c18, 0x4c8dbc39e7b756c1, 0x70d9b6cc6d87df20});
+    Scalar c = a * b;
+
+    EXPECT_EQ(G1Affine(gen * a) * b, gen * c);
+}
+
 TEST(TestG1, TorsionFree) {
     G1Affine a{
             Fp({
@@ -321,6 +330,18 @@ TEST(TestG1, TorsionFree) {
     EXPECT_FALSE(a.is_torsion_free());
     EXPECT_TRUE(G1Affine::identity().is_torsion_free());
     EXPECT_TRUE(G1Affine::generator().is_torsion_free());
+}
+
+TEST(TestG1, MulByX) {
+    G1Projective gen = G1Projective::generator();
+    Scalar x = -Scalar(BLS_X);
+
+    auto ta = gen * x;
+    auto tb = gen.mul_by_x();
+
+    EXPECT_EQ(gen.mul_by_x(), gen * x);
+    G1Projective point = G1Projective::generator() * Scalar(42);
+    EXPECT_EQ(point.mul_by_x(), point * x);
 }
 
 TEST(TestG1, CofactorClearance) {
@@ -354,6 +375,9 @@ TEST(TestG1, CofactorClearance) {
 
     EXPECT_TRUE(cleared.is_on_curve());
     EXPECT_TRUE(G1Affine(cleared).is_torsion_free());
+
+    Scalar h_eff = Scalar(1) + Scalar(BLS_X);
+    EXPECT_EQ(point.clear_cofactor(), h_eff * point);
 }
 
 TEST(TestG1, BatchNormalize) {
@@ -378,4 +402,18 @@ TEST(TestG1, BatchNormalize) {
             }
         }
     }
+}
+
+TEST(TestG1, CommutativeScalarSubgroupMul) {
+    Scalar a = Scalar::from_raw({0x1fff3231233ffffd, 0x4884b7fa00034802, 0x998c4fefecbc4ff3, 0x1824b159acc50562});
+    G1Affine g1_a = G1Affine::generator();
+    G1Projective g1_p = G1Projective::generator();
+
+    // commutative
+    EXPECT_EQ(g1_a * a, a * g1_a);
+    EXPECT_EQ(g1_p * a, a * g1_p);
+
+    // mixed
+    EXPECT_EQ(g1_a * a, a * g1_p);
+    EXPECT_EQ(g1_p * a, a * g1_a);
 }

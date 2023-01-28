@@ -10,10 +10,16 @@ private:
 
 public:
     Fp12();
-    explicit Fp12(Fp fp);
-    explicit Fp12(Fp2 fp);
-    explicit Fp12(Fp6 fp);
-    explicit Fp12(Fp6 fp0, Fp6 fp1);
+
+    explicit Fp12(Fp &&fp);
+    explicit Fp12(Fp2 &&fp);
+    explicit Fp12(Fp6 &&fp);
+    explicit Fp12(Fp6 &&fp0, Fp6 &&fp1);
+
+    explicit Fp12(const Fp &fp);
+    explicit Fp12(const Fp2 &fp);
+    explicit Fp12(const Fp6 &fp);
+    explicit Fp12(const Fp6 &fp0, const Fp6 &fp1);
 
     static Fp12 zero();
     static Fp12 one();
@@ -24,17 +30,17 @@ public:
     [[nodiscard]] Fp12 square() const;
     [[nodiscard]] Fp12 conjugate() const;
     [[nodiscard]] Fp12 frobenius_map() const;
-    [[nodiscard]] Fp12 mul_by_fp2(Fp2 fp0, Fp2 fp1, Fp2 fp4) const;
+    [[nodiscard]] Fp12 mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp4) const;
 
     [[nodiscard]] std::optional<Fp12> invert() const;
 
 public:
+    Fp12 operator-() const;
     Fp12 &operator=(const Fp12 &rhs);
+
     Fp12 &operator+=(const Fp12 &rhs);
     Fp12 &operator-=(const Fp12 &rhs);
     Fp12 &operator*=(const Fp12 &rhs);
-
-    Fp12 operator-() const;
 
 private:
     friend inline Fp12 operator+(const Fp12 &a, const Fp12 &b) { return Fp12(a) += b; }

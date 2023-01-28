@@ -6,13 +6,10 @@
 #include "utils/encode.h"
 #include "utils/random.h"
 
-Fp::Fp() : data{} {}
-
+Fp::Fp() : data{0} {}
 Fp::Fp(uint64_t val) : data{val} {}
-
-Fp::Fp(const std::array<uint64_t, Fp::WIDTH> data) : data{0} {
-    this->data = data;
-}
+Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) : data{data} {}
+Fp::Fp(const std::array<uint64_t, Fp::WIDTH> &data) : data{data} {}
 
 Fp Fp::zero() {
     return Fp{};
@@ -24,15 +21,15 @@ Fp Fp::one() {
 
 Fp Fp::random() {
     std::array<uint64_t, Fp::WIDTH * 2> randoms{};
-    for (uint64_t &random: randoms) random = getRandom();
-    return reduce(randoms);
+    for (uint64_t &random: randoms) random = getRandom<uint64_t>();
+    return Fp::reduce(randoms);
 }
 
-Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> ts) {
+Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
     uint64_t k;
     uint64_t carry = 0;
 
-    uint64_t r[12];
+    std::array<uint64_t, Fp::WIDTH * 2> r{};
     for (int i = 0; i < Fp::WIDTH * 2; ++i)
         r[i] = i < Fp::WIDTH ? ts[i] : 0;
 
@@ -82,7 +79,7 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
 }
 
 /// Tries to convert a big-endian byte representation of a scalar into an `Fp`.
-std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes) {
+std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> &bytes) {
     std::array<std::array<uint8_t, sizeof(uint64_t)>, Fp::WIDTH> array{};
     std::array<uint64_t, Fp::WIDTH> data{};
 
@@ -95,9 +92,8 @@ std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::WIDTH * sizeof(ui
 
     // try to subtract the modulus
     uint64_t borrow = 0;
-    for (int i = 0; i < WIDTH; ++i) {
+    for (int i = 0; i < Fp::WIDTH; ++i)
         std::tie(std::ignore, borrow) = sbb(temp.data[i], MODULUS[i], borrow);
-    }
 
     // if the element is smaller than the modulus, the subtraction would underflow, generating a `borrow` of
     // 0xfff...fff. Otherwise, it would be 0.
@@ -154,11 +150,10 @@ std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> Fp::to_bytes() const {
     std::array<uint8_t, sizeof(uint64_t)> temp{};
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes{0};
 
-    for (int i = 0; i < WIDTH; ++i) {
-        temp = uint64_to_be_bytes(point.data[WIDTH - 1 - i]);
-        for (int j = 0; j < sizeof(uint64_t); ++j) {
+    for (int i = 0; i < Fp::WIDTH; ++i) {
+        temp = uint64_to_be_bytes(point.data[Fp::WIDTH - 1 - i]);
+        for (int j = 0; j < sizeof(uint64_t); ++j)
             bytes[i * 8 + j] = temp[j];
-        }
     }
     return bytes;
 }
@@ -221,15 +216,12 @@ Fp Fp::subtract_modulus() const {
     return Fp({d[0], d[1], d[2], d[3], d[4], d[5]});
 }
 
-Fp Fp::pow_vartime(const std::array<uint64_t, Fp::WIDTH> exp) const {
+Fp Fp::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp res = Fp::one();
     for (int i = Fp::WIDTH - 1; i >= 0; i--) {
         for (int32_t j = 63; j >= 0; j--) {
             res = res.square();
-
-            if (((exp[i] >> j) & 0x01) == 0x01) {
-                res *= *this;
-            }
+            if (((exp[i] >> j) & 0x01) == 0x01) res *= *this;
         }
     }
     return res;
@@ -269,7 +261,7 @@ std::optional<Fp> Fp::invert() const {
 }
 
 /// Reduces a big-endian 64-bit limb representation of a 768-bit number.
-Fp Fp::reduce(const std::array<uint64_t, Fp::WIDTH * 2> limbs) {
+Fp Fp::reduce(const std::array<uint64_t, Fp::WIDTH * 2> &limbs) {
     Fp d1({limbs[11], limbs[10], limbs[9], limbs[8], limbs[7], limbs[6]});
     Fp d0({limbs[5], limbs[4], limbs[3], limbs[2], limbs[1], limbs[0]});
     return d0 * R2 + d1 * R3;
@@ -277,9 +269,8 @@ Fp Fp::reduce(const std::array<uint64_t, Fp::WIDTH * 2> limbs) {
 
 Fp &Fp::operator=(const Fp &rhs) {
     if (this == &rhs) return *this;
-    for (int i = 0; i < std::size(this->data); ++i) {
+    for (int i = 0; i < this->data.size(); ++i)
         this->data[i] = rhs.data[i];
-    }
     return *this;
 }
 
@@ -324,8 +315,10 @@ Fp Fp::operator-() const {
     bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3] | this->data[4] | this->data[5]) == 0;
     uint64_t mask = static_cast<uint64_t>(dec) - 1;
 
-    return Fp({
-                      d[0] & mask, d[1] & mask, d[2] & mask,
-                      d[3] & mask, d[4] & mask, d[5] & mask
-              });
+    return Fp(
+            {
+                    d[0] & mask, d[1] & mask, d[2] & mask,
+                    d[3] & mask, d[4] & mask, d[5] & mask
+            }
+    );
 }

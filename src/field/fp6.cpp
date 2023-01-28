@@ -2,11 +2,13 @@
 
 Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(const Fp fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(Fp &&fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(Fp2 &&fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
-Fp6::Fp6(const Fp2 fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
-
-Fp6::Fp6(const Fp2 fp0, const Fp2 fp1, const Fp2 fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
+Fp6::Fp6(const Fp &fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp2 &fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
 Fp6 Fp6::zero() {
     return Fp6{
@@ -52,7 +54,7 @@ Fp6 Fp6::square() const {
     };
 }
 
-Fp6 Fp6::mul_by_fp2(const Fp2 fp) const {
+Fp6 Fp6::mul_by_fp2(const Fp2 &fp) const {
     return Fp6{
             (this->c2 * fp).mul_by_non_residue(),
             this->c0 * fp,
@@ -60,7 +62,7 @@ Fp6 Fp6::mul_by_fp2(const Fp2 fp) const {
     };
 }
 
-Fp6 Fp6::mul_by_fp2(const Fp2 fp0, const Fp2 fp1) const {
+Fp6 Fp6::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1) const {
     Fp2 a_a = this->c0 * fp0;
     Fp2 b_b = this->c1 * fp1;
 
@@ -71,7 +73,7 @@ Fp6 Fp6::mul_by_fp2(const Fp2 fp0, const Fp2 fp1) const {
     return Fp6{t1, t2, t3};
 }
 
-Fp6 Fp6::mul_interleaved(const Fp6 b) const {
+Fp6 Fp6::mul_interleaved(const Fp6 &b) const {
     Fp6 a = *this;
     Fp b10_p_b11 = b.c1.getC0() + b.c1.getC1();
     Fp b10_m_b11 = b.c1.getC0() - b.c1.getC1();

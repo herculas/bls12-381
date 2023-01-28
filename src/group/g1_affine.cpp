@@ -1,10 +1,11 @@
 #include "group/g1_affine.h"
 #include "group/g1_projective.h"
 #include "field/constant.h"
+#include "scalar/scalar.h"
 
 G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}
 
-G1Affine::G1Affine(const G1Projective point) : x{Fp::zero()}, y{Fp::one()}, infinity{true} {
+G1Affine::G1Affine(G1Projective &&point) : x{Fp::zero()}, y{Fp::one()}, infinity{true} {
     Fp z_inv = point.getZ().invert().value_or(Fp::zero());
     Fp rx = point.getX() * z_inv;
     Fp ry = point.getY() * z_inv;
@@ -12,7 +13,17 @@ G1Affine::G1Affine(const G1Projective point) : x{Fp::zero()}, y{Fp::one()}, infi
     if (!z_inv.is_zero()) *this = temp;
 }
 
-G1Affine::G1Affine(const Fp x, const Fp y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
+G1Affine::G1Affine(Fp &&x, Fp &&y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
+
+G1Affine::G1Affine(const G1Projective &point) : x{Fp::zero()}, y{Fp::one()}, infinity{true} {
+    Fp z_inv = point.getZ().invert().value_or(Fp::zero());
+    Fp rx = point.getX() * z_inv;
+    Fp ry = point.getY() * z_inv;
+    G1Affine temp{rx, ry, false};
+    if (!z_inv.is_zero()) *this = temp;
+}
+
+G1Affine::G1Affine(const Fp &x, const Fp &y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
 
 G1Affine G1Affine::identity() {
     return G1Affine{};
@@ -32,14 +43,15 @@ G1Affine G1Affine::generator() {
     };
 }
 
-std::optional<G1Affine> G1Affine::from_compressed(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes) {
+std::optional<G1Affine> G1Affine::from_compressed(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> &bytes) {
     std::optional<G1Affine> res = G1Affine::from_compressed_unchecked(bytes);
     if (!res.has_value()) return std::nullopt;
     if (!res.value().is_torsion_free()) return std::nullopt;
     return res.value();
 }
 
-std::optional<G1Affine> G1Affine::from_compressed_unchecked(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes) {
+std::optional<G1Affine>
+G1Affine::from_compressed_unchecked(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> &bytes) {
     bool compression_flag_set = (bytes[0] >> 7) & 1;
     bool infinity_flat_set = (bytes[0] >> 6) & 1;
     bool sort_flat_set = (bytes[0] >> 5) & 1;
@@ -70,7 +82,8 @@ std::optional<G1Affine> G1Affine::from_compressed_unchecked(const std::array<uin
     };
 }
 
-std::optional<G1Affine> G1Affine::from_uncompressed(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> bytes) {
+std::optional<G1Affine>
+G1Affine::from_uncompressed(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> &bytes) {
     assert(bytes.size() == Fp::WIDTH * sizeof(uint64_t) * 2);
     std::optional<G1Affine> res = G1Affine::from_uncompressed_unchecked(bytes);
     if (!res.has_value()) return std::nullopt;
@@ -78,7 +91,8 @@ std::optional<G1Affine> G1Affine::from_uncompressed(const std::array<uint8_t, Fp
     return res.value();
 }
 
-std::optional<G1Affine> G1Affine::from_uncompressed_unchecked(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> bytes) {
+std::optional<G1Affine>
+G1Affine::from_uncompressed_unchecked(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> &bytes) {
     assert(bytes.size() == Fp::WIDTH * sizeof(uint64_t) * 2);
 
     bool compression_flag_set = (bytes[0] >> 7) & 1;
@@ -139,9 +153,12 @@ bool G1Affine::is_torsion_free() const {
 std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> G1Affine::to_compressed() const {
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes = (this->infinity ? Fp::zero() : this->x).to_bytes();
 
-    bytes[0] |= (static_cast<uint8_t>(1) << 7);                                                                         // compression flag
-    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6) : static_cast<uint8_t>(0));                            // infinity flag
-    bytes[0] |= (((!this->infinity) && this->y.lexicographically_largest()) ? (static_cast<uint8_t>(1) << 5)            // sort flag
+    bytes[0] |= (static_cast<uint8_t>(1)
+            << 7);                                                                         // compression flag
+    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6)
+                                : static_cast<uint8_t>(0));                            // infinity flag
+    bytes[0] |= (((!this->infinity) && this->y.lexicographically_largest()) ? (static_cast<uint8_t>(1)
+            << 5)            // sort flag
                                                                             : static_cast<uint8_t>(0));
     return bytes;
 }
@@ -150,12 +167,13 @@ std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> G1Affine::to_uncompressed(
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t) * 2> bytes{};
 
     std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> x_bytes = (this->infinity ? Fp::zero() : this->x).to_bytes();
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> y_bytes = (this->infinity ?   Fp::zero():this->y).to_bytes();
+    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> y_bytes = (this->infinity ? Fp::zero() : this->y).to_bytes();
 
     std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin());
     std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + Fp::WIDTH * sizeof(uint64_t));
 
-    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6) : static_cast<uint8_t>(0));                            // infinity flag
+    bytes[0] |= (this->infinity ? (static_cast<uint8_t>(1) << 6)
+                                : static_cast<uint8_t>(0));                            // infinity flag
 
     return bytes;
 }
@@ -180,4 +198,16 @@ G1Affine G1Affine::operator-() const {
             this->infinity ? Fp::one() : (-this->y),
             this->infinity,
     };
+}
+
+G1Projective operator+(const G1Affine &a, const G1Projective &b) {
+    return G1Projective(b) += a;
+}
+
+G1Projective operator-(const G1Affine &a, const G1Projective &b) {
+    return -G1Projective(b) += a;
+}
+
+G1Projective operator*(const G1Affine &a, const Scalar &b) {
+    return G1Projective(a) *= b;
 }

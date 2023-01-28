@@ -4,6 +4,12 @@
 #include <cstdint>
 #include <random>
 
-uint64_t getRandom(uint64_t max = std::numeric_limits<uint64_t>::max()) noexcept;
+template<typename T>
+T getRandom(T max = std::numeric_limits<T>::max()) noexcept {
+    std::random_device device;
+    std::default_random_engine randomEngine(device());
+    std::uniform_int_distribution<uint64_t> distribution{0, max};
+    return distribution(randomEngine);
+}
 
 #endif //BLS12_381_RANDOM_H
