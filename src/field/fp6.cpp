@@ -1,13 +1,19 @@
 #include "field/fp6.h"
 
+namespace bls12_381::field {
+
 Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
 Fp6::Fp6(Fp &&fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
 Fp6::Fp6(Fp2 &&fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
 Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
 Fp6::Fp6(const Fp &fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
 Fp6::Fp6(const Fp2 &fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
 Fp6::Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
 Fp6 Fp6::zero() {
@@ -195,3 +201,5 @@ Fp6 Fp6::operator-() const {
             -this->c2
     };
 }
+
+} // namespace bls12_381::field

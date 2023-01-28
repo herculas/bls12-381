@@ -1,5 +1,7 @@
 #include "utils/encode.h"
 
+namespace bls12_381::util::encoding {
+
 std::string hexStr(const std::span<uint8_t> span) {
     std::string result;
     static constexpr char hexMap[16] = {
@@ -15,3 +17,5 @@ std::string hexStr(const std::span<uint8_t> span) {
     }
     return result;
 }
+
+} // namespace bls12_381::util::encoding

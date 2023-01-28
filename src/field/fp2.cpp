@@ -2,12 +2,16 @@
 
 #include <string>
 
+namespace bls12_381::field {
+
 Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
 
 Fp2::Fp2(Fp &&fp) : c0{fp}, c1{Fp::zero()} {}
+
 Fp2::Fp2(Fp &&fp0, Fp &&fp1) : c0{fp0}, c1{fp1} {}
 
 Fp2::Fp2(const Fp &fp) : c0{fp}, c1{Fp::zero()} {}
+
 Fp2::Fp2(const Fp &fp0, const Fp &fp1) : c0{fp0}, c1{fp1} {}
 
 Fp2 Fp2::zero() {
@@ -189,3 +193,5 @@ Fp Fp2::getC0() const {
 Fp Fp2::getC1() const {
     return this->c1;
 }
+
+} // namespace bls12_381::field

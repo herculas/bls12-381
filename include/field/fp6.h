@@ -3,6 +3,8 @@
 
 #include "fp2.h"
 
+namespace bls12_381::field {
+
 class Fp6 {
 private:
     Fp2 c0;
@@ -53,5 +55,6 @@ public:
     friend inline bool operator==(const Fp6 &a, const Fp6 &b) { return a.c0 == b.c0 && a.c1 == b.c1 && a.c2 == b.c2; }
     friend inline bool operator!=(const Fp6 &a, const Fp6 &b) { return a.c0 != b.c0 || a.c1 != b.c1 || a.c2 != b.c2; }
 };
+} // namespace bls12_381::field
 
 #endif //BLS12_381_FP6_H

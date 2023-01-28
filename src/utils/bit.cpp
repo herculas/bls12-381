@@ -1,5 +1,7 @@
 #include "utils/bit.h"
 
+namespace bls12_381::util::bit_operation {
+
 uint64_t be_bytes_to_uint64(const std::array<uint8_t, sizeof(uint64_t)> bytes) {
     uint64_t sum = 0;
     for (int i = 0; i < sizeof(uint64_t); ++i)
@@ -27,3 +29,5 @@ std::array<uint8_t, sizeof(uint64_t)> uint64_to_le_bytes(uint64_t value) {
         bytes[i] = static_cast<uint8_t>(value >> (i * 8)) & 0x00ff;
     return bytes;
 }
+
+} // namespace bls12_381::util::bit_operation

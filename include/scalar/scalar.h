@@ -8,6 +8,8 @@
 #include "group/g1_affine.h"
 #include "group/g1_projective.h"
 
+namespace bls12_381::scalar {
+
 class Scalar {
 public:
     static constexpr int32_t WIDTH = 4;
@@ -59,11 +61,12 @@ public:
     friend inline Scalar operator-(const Scalar &a, const Scalar &b) { return Scalar(a) -= b; }
     friend inline Scalar operator*(const Scalar &a, const Scalar &b) { return Scalar(a) *= b; }
 
-    friend G1Projective operator*(const Scalar &a, const G1Affine &b);
-    friend G1Projective operator*(const Scalar &a, const G1Projective &b);
+    friend group::G1Projective operator*(const Scalar &a, const group::G1Affine &b);
+    friend group::G1Projective operator*(const Scalar &a, const group::G1Projective &b);
 
     friend inline bool operator==(const Scalar &a, const Scalar &b) { return a.data == b.data; }
     friend inline bool operator!=(const Scalar &a, const Scalar &b) { return a.data != b.data; }
 };
+} // namespace bls12_381::scalar
 
 #endif //BLS12_381_SCALAR_H

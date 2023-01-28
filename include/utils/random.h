@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <random>
 
+namespace bls12_381::util::random {
+
 template<typename T>
 T getRandom(T max = std::numeric_limits<T>::max()) noexcept {
     std::random_device device;
@@ -12,4 +14,6 @@ T getRandom(T max = std::numeric_limits<T>::max()) noexcept {
     return distribution(randomEngine);
 }
 
-#endif //BLS12_381_RANDOM_H
+} // namespace bls12_381::util::random
+
+#endif //BLS12_381_RANDOM_H\

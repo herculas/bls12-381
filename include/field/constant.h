@@ -3,6 +3,8 @@
 
 #include "field/fp.h"
 
+namespace bls12_381::field::constant {
+
 /// The modulus of the finite field.
 const uint64_t MODULUS[Fp::WIDTH] = {
         0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
@@ -50,5 +52,7 @@ const Fp BETA(
                 0xc26a2ff874fd029b, 0x3636b76660701c6e, 0x051ba4ab241b6160,
         }
 );
+
+} // namespace bls12_381::field::constant
 
 #endif //BLS12_381_FIELD_CONSTANT_H

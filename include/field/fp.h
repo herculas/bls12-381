@@ -6,6 +6,8 @@
 #include <optional>
 #include <vector>
 
+namespace bls12_381::field {
+
 class Fp {
 public:
     static constexpr int32_t WIDTH = 6;
@@ -59,5 +61,6 @@ public:
     friend inline bool operator==(const Fp &a, const Fp &b) { return a.data == b.data; }
     friend inline bool operator!=(const Fp &a, const Fp &b) { return a.data != b.data; }
 };
+} // namespace bls12_381::field
 
 #endif //BLS12_381_FP_H

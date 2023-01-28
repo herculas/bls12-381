@@ -3,6 +3,8 @@
 
 #include "scalar/scalar.h"
 
+namespace bls12_381::scalar::constant {
+
 const uint32_t MODULUS_LIMBS_32[Scalar::WIDTH * 2] = {
         0x00000001, 0xffffffff, 0xfffe5bfe, 0x53bda402,
         0x09a1d805, 0x3339d808, 0x299d7d48, 0x73eda753,
@@ -53,5 +55,7 @@ const Scalar ROOT_OF_UNITY(
                 0x0af53ae352a31e64, 0x5bf3adda19e9b27b,
         }
 );
+
+} // namespace bls12_381::scalar::constant
 
 #endif //BLS12_381_SCALAR_CONSTANT_H
