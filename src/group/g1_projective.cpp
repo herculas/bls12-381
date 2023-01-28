@@ -1,7 +1,8 @@
 #include "group/g1_projective.h"
-#include "group/g1_affine.h"
-#include "group/constant.h"
+
 #include "field/constant.h"
+#include "group/constant.h"
+#include "group/g1_affine.h"
 #include "scalar/scalar.h"
 #include "utils/random.h"
 

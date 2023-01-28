@@ -1,11 +1,12 @@
 #include "scalar/scalar.h"
-#include "scalar/constant.h"
+
 #include "group/g1_affine.h"
 #include "group/g1_projective.h"
-#include "utils/random.h"
+#include "scalar/constant.h"
 #include "utils/arith.h"
 #include "utils/bit.h"
 #include "utils/encode.h"
+#include "utils/random.h"
 
 Scalar::Scalar() : data{0} {}
 

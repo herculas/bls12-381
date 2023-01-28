@@ -1,4 +1,5 @@
 #include "utils/arith.h"
+
 #include <tuple>
 
 std::tuple<uint64_t, uint64_t> adc(uint64_t a, uint64_t b, uint64_t carry) {

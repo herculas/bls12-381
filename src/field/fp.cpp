@@ -1,8 +1,8 @@
 #include "field/fp.h"
 
+#include "field/constant.h"
 #include "utils/arith.h"
 #include "utils/bit.h"
-#include "field/constant.h"
 #include "utils/encode.h"
 #include "utils/random.h"
 

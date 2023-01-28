@@ -1,6 +1,7 @@
 #include "group/g1_affine.h"
-#include "group/g1_projective.h"
+
 #include "field/constant.h"
+#include "group/g1_projective.h"
 #include "scalar/scalar.h"
 
 G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}

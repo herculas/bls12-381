@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "scalar/scalar.h"
 #include "scalar/constant.h"
+#include "scalar/scalar.h"
 
 TEST(TestScalar, Inv) {
     uint64_t inv = 1;

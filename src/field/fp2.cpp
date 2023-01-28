@@ -1,5 +1,6 @@
-#include <string>
 #include "field/fp2.h"
+
+#include <string>
 
 Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
 
