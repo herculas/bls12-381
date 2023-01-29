@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "field/constant.h"
 #include "group/constant.h"
+#include "group/g1_affine.h"
+#include "group/g1_projective.h"
 #include "scalar/scalar.h"
 
 TEST(TestG1, Beta) {
@@ -30,8 +32,8 @@ TEST(TestG1, OnCurve) {
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
     bls12_381::group::G1Affine gen = bls12_381::group::G1Affine::generator();
-    bls12_381::group::G1Projective test1{gen.getX() * z, gen.getY() * z, z};
-    bls12_381::group::G1Projective test2{z, gen.getY() * z, z};
+    bls12_381::group::G1Projective test1{gen.get_x() * z, gen.get_y() * z, z};
+    bls12_381::group::G1Projective test2{z, gen.get_y() * z, z};
 
     EXPECT_TRUE(test1.is_on_curve());
     EXPECT_FALSE(test2.is_on_curve());
@@ -60,9 +62,9 @@ TEST(TestG1, ProjectiveEquality) {
                                    0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
-    bls12_381::group::G1Projective p1{a.getX() * z, a.getY() * z, z};
-    bls12_381::group::G1Projective p2{a.getX() * z, -a.getY() * z, z};
-    bls12_381::group::G1Projective p3{z, a.getY() * z, z};
+    bls12_381::group::G1Projective p1{a.get_x() * z, a.get_y() * z, z};
+    bls12_381::group::G1Projective p2{a.get_x() * z, -a.get_y() * z, z};
+    bls12_381::group::G1Projective p3{z, a.get_y() * z, z};
 
     EXPECT_TRUE(p1.is_on_curve());
     EXPECT_TRUE(p2.is_on_curve());
@@ -135,7 +137,7 @@ TEST(TestG1, Add2) {
                                    0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
-    b = bls12_381::group::G1Projective{b.getX() * z, b.getY() * z, z};
+    b = bls12_381::group::G1Projective{b.get_x() * z, b.get_y() * z, z};
     bls12_381::group::G1Projective c = a + b;
 
     EXPECT_FALSE(c.is_identity());
@@ -151,7 +153,7 @@ TEST(TestG1, Add3) {
                                    0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
-    b = bls12_381::group::G1Projective{b.getX() * z, b.getY() * z, z};
+    b = bls12_381::group::G1Projective{b.get_x() * z, b.get_y() * z, z};
     bls12_381::group::G1Projective c = b + a;
 
     EXPECT_FALSE(c.is_identity());
@@ -181,7 +183,7 @@ TEST(TestG1, Add5) {
     beta = beta.square();
 
     bls12_381::group::G1Projective a = bls12_381::group::G1Projective::generator().doubles().doubles();
-    bls12_381::group::G1Projective b{a.getX() * beta, -a.getY(), a.getZ()};
+    bls12_381::group::G1Projective b{a.get_x() * beta, -a.get_y(), a.get_z()};
 
     EXPECT_TRUE(a.is_on_curve());
     EXPECT_TRUE(b.is_on_curve());
@@ -221,7 +223,7 @@ TEST(TestG1, MixAdd2) {
                                    0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
-    b = bls12_381::group::G1Projective{b.getX() * z, b.getY() * z, z};
+    b = bls12_381::group::G1Projective{b.get_x() * z, b.get_y() * z, z};
     bls12_381::group::G1Projective c = a + b;
 
     EXPECT_FALSE(c.is_identity());
@@ -237,7 +239,7 @@ TEST(TestG1, MixAdd3) {
                                    0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                                    0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
                            });
-    b = bls12_381::group::G1Projective{b.getX() * z, b.getY() * z, z};
+    b = bls12_381::group::G1Projective{b.get_x() * z, b.get_y() * z, z};
     bls12_381::group::G1Projective c = b + a;
 
     EXPECT_FALSE(c.is_identity());
@@ -267,7 +269,7 @@ TEST(TestG1, MixAdd5) {
     beta = beta.square();
 
     bls12_381::group::G1Projective a = bls12_381::group::G1Projective::generator().doubles().doubles();
-    bls12_381::group::G1Projective b{a.getX() * beta, -a.getY(), a.getZ()};
+    bls12_381::group::G1Projective b{a.get_x() * beta, -a.get_y(), a.get_z()};
 
     bls12_381::group::G1Affine aa(a);
 

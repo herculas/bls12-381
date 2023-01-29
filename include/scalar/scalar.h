@@ -5,14 +5,20 @@
 #include <cstdint>
 #include <optional>
 
-#include "group/g1_affine.h"
-#include "group/g1_projective.h"
+namespace bls12_381::group {
+class G1Affine;
+class G2Affine;
+class G1Projective;
+class G2Projective;
+}
 
 namespace bls12_381::scalar {
 
 class Scalar {
 public:
     static constexpr int32_t WIDTH = 4;
+    static constexpr int32_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
+
 private:
     std::array<uint64_t, Scalar::WIDTH> data;
 
@@ -29,13 +35,13 @@ public:
 
     static Scalar montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &rs);
     static Scalar from_raw(const std::array<uint64_t, Scalar::WIDTH> &values);
-    static Scalar from_bytes_wide(const std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t) * 2> &bytes);
+    static Scalar from_bytes_wide(const std::array<uint8_t, Scalar::BYTE_SIZE * 2> &bytes);
 
-    static std::optional<Scalar> from_bytes(const std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> &bytes);
+    static std::optional<Scalar> from_bytes(const std::array<uint8_t, Scalar::BYTE_SIZE> &bytes);
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] std::string getHex() const;
-    [[nodiscard]] std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> to_bytes() const;
+    [[nodiscard]] std::array<uint8_t, Scalar::BYTE_SIZE> to_bytes() const;
 
     [[nodiscard]] Scalar doubles() const;
     [[nodiscard]] Scalar square() const;
@@ -63,6 +69,8 @@ public:
 
     friend group::G1Projective operator*(const Scalar &a, const group::G1Affine &b);
     friend group::G1Projective operator*(const Scalar &a, const group::G1Projective &b);
+    friend group::G2Projective operator*(const Scalar &a, const group::G2Affine &b);
+    friend group::G2Projective operator*(const Scalar &a, const group::G2Projective &b);
 
     friend inline bool operator==(const Scalar &a, const Scalar &b) { return a.data == b.data; }
     friend inline bool operator!=(const Scalar &a, const Scalar &b) { return a.data != b.data; }

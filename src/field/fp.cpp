@@ -56,7 +56,7 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
 
     uint64_t u[Fp::WIDTH] = {0};
 
-    for (int j = 0; j < WIDTH; ++j) {
+    for (int j = 0; j < Fp::WIDTH; ++j) {
         uint64_t t[Fp::WIDTH + 1] = {0};
         for (int i = 0; i < Fp::WIDTH; ++i) t[i] = u[i];
 
@@ -84,7 +84,7 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
 }
 
 /// Tries to convert a big-endian byte representation of a scalar into an `Fp`.
-std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> &bytes) {
+std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::BYTE_SIZE> &bytes) {
     std::array<std::array<uint8_t, sizeof(uint64_t)>, Fp::WIDTH> array{};
     std::array<uint64_t, Fp::WIDTH> data{};
 
@@ -143,7 +143,7 @@ bool Fp::lexicographically_largest() const {
 }
 
 /// Converts an element of `Fp` into a big-endian byte array.
-std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> Fp::to_bytes() const {
+std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     std::array<uint64_t, Fp::WIDTH * 2> contents{0};
     for (int i = 0; i < std::size(contents); ++i)
         if (i < WIDTH)
@@ -153,7 +153,7 @@ std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> Fp::to_bytes() const {
     Fp point = Fp::montgomery_reduce(contents);
 
     std::array<uint8_t, sizeof(uint64_t)> temp{};
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes{0};
+    std::array<uint8_t, Fp::BYTE_SIZE> bytes{0};
 
     for (int i = 0; i < Fp::WIDTH; ++i) {
         temp = bls12_381::util::bit_operation::uint64_to_be_bytes(point.data[Fp::WIDTH - 1 - i]);
@@ -164,7 +164,7 @@ std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> Fp::to_bytes() const {
 }
 
 std::string Fp::getHex() const {
-    std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> bytes = this->to_bytes();
+    std::array<uint8_t, Fp::BYTE_SIZE> bytes = this->to_bytes();
 
     std::string res = "0x";
     res += bls12_381::util::encoding::hexStr(bytes);

@@ -2,6 +2,7 @@
 #define BLS12_381_FIELD_CONSTANT_H
 
 #include "field/fp.h"
+#include "fp2.h"
 
 namespace bls12_381::field::constant {
 
@@ -44,6 +45,36 @@ const Fp B(
                 0xb1d37ebee6ba24d7, 0x8ec9733bbf78ab2f, 0x09d645513d83de7e,
         }
 );
+
+const Fp2 B2{
+        Fp(
+                {
+                        0xaa270000000cfff3, 0x53cc0032fc34000a, 0x478fe97a6b0a807f,
+                        0xb1d37ebee6ba24d7, 0x8ec9733bbf78ab2f, 0x09d645513d83de7e,
+                }
+        ),
+        Fp(
+                {
+                        0xaa270000000cfff3, 0x53cc0032fc34000a, 0x478fe97a6b0a807f,
+                        0xb1d37ebee6ba24d7, 0x8ec9733bbf78ab2f, 0x09d645513d83de7e,
+                }
+        ),
+};
+
+const Fp2 B3{
+        Fp(
+                {
+                        0x4476000000275400, 0xdcb8009a43480000, 0x6f7ee9ce4a6e8c00,
+                        0xb10330b7c0a95800, 0x6140b1fcfb1e5400, 0x0381be097f0bb4e0,
+                }
+        ),
+        Fp(
+                {
+                        0x4476000000275400, 0xdcb8009a43480000, 0x6f7ee9ce4a6e8c00,
+                        0xb10330b7c0a95800, 0x6140b1fcfb1e5400, 0x0381be097f0bb4e0,
+                }
+        ),
+};
 
 /// A non-trivial third root of unity in Fp.
 const Fp BETA(

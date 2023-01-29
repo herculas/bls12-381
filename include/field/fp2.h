@@ -23,8 +23,8 @@ public:
     static Fp2 one();
     static Fp2 random();
 
-    [[nodiscard]] Fp getC0() const;
-    [[nodiscard]] Fp getC1() const;
+    [[nodiscard]] Fp get_c0() const;
+    [[nodiscard]] Fp get_c1() const;
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;

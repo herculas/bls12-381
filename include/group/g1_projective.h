@@ -3,10 +3,8 @@
 
 #include "field/fp.h"
 
-namespace bls12_381 {
-namespace scalar { class Scalar; }
-namespace group { class G1Affine; }
-}
+namespace bls12_381::scalar { class Scalar; }
+namespace bls12_381::group { class G1Affine; }
 
 namespace bls12_381::group {
 
@@ -31,9 +29,9 @@ public:
 
     static std::vector<G1Affine> batch_normalize(const std::vector<G1Projective> &points);
 
-    [[nodiscard]] field::Fp getX() const;
-    [[nodiscard]] field::Fp getY() const;
-    [[nodiscard]] field::Fp getZ() const;
+    [[nodiscard]] field::Fp get_x() const;
+    [[nodiscard]] field::Fp get_y() const;
+    [[nodiscard]] field::Fp get_z() const;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
@@ -41,9 +39,11 @@ public:
     [[nodiscard]] G1Projective doubles() const;
     [[nodiscard]] G1Projective add(const G1Projective &rhs) const;
     [[nodiscard]] G1Projective add_mixed(const G1Affine &rhs) const;
-    [[nodiscard]] G1Projective multiply(const std::array<uint8_t, 32> &bytes) const;
     [[nodiscard]] G1Projective mul_by_x() const;
     [[nodiscard]] G1Projective clear_cofactor() const;
+
+private:
+    [[nodiscard]] G1Projective multiply(const std::array<uint8_t, 32> &bytes) const;
 
 public:
     G1Projective operator-() const;
@@ -82,6 +82,7 @@ public:
         return !(a == b);
     }
 };
+
 } // namespace bls12_381::group
 
 #endif //BLS12_381_G1_PROJECTIVE_H

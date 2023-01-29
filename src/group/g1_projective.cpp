@@ -10,12 +10,12 @@ namespace bls12_381::group {
 
 G1Projective::G1Projective() : x{field::Fp::zero()}, y{field::Fp::one()}, z{field::Fp::zero()} {}
 
-G1Projective::G1Projective(G1Affine &&point) : x{point.getX()}, y{point.getY()},
+G1Projective::G1Projective(G1Affine &&point) : x{point.get_x()}, y{point.get_y()},
                                                z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
 
 G1Projective::G1Projective(field::Fp &&x, field::Fp &&y, field::Fp &&z) : x{x}, y{y}, z{z} {}
 
-G1Projective::G1Projective(const G1Affine &point) : x{point.getX()}, y{point.getY()},
+G1Projective::G1Projective(const G1Affine &point) : x{point.get_x()}, y{point.get_y()},
                                                     z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
 
 G1Projective::G1Projective(const field::Fp &x, const field::Fp &y, const field::Fp &z) : x{x}, y{y}, z{z} {}
@@ -79,15 +79,15 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     return results;
 }
 
-field::Fp G1Projective::getX() const {
+field::Fp G1Projective::get_x() const {
     return this->x;
 }
 
-field::Fp G1Projective::getY() const {
+field::Fp G1Projective::get_y() const {
     return this->y;
 }
 
-field::Fp G1Projective::getZ() const {
+field::Fp G1Projective::get_z() const {
     return this->z;
 }
 
@@ -170,16 +170,16 @@ G1Projective G1Projective::add(const G1Projective &rhs) const {
 }
 
 G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
-    field::Fp t0 = this->x * rhs.getX();
-    field::Fp t1 = this->y * rhs.getY();
-    field::Fp t3 = rhs.getX() + rhs.getY();
+    field::Fp t0 = this->x * rhs.get_x();
+    field::Fp t1 = this->y * rhs.get_y();
+    field::Fp t3 = rhs.get_x() + rhs.get_y();
     field::Fp t4 = this->x + this->y;
     t3 = t3 * t4;
     t4 = t0 + t1;
     t3 = t3 - t4;
-    t4 = rhs.getY() * this->z;
+    t4 = rhs.get_y() * this->z;
     t4 = t4 + this->y;
-    field::Fp y3 = rhs.getX() * this->z;
+    field::Fp y3 = rhs.get_x() * this->z;
     y3 = y3 + this->x;
     field::Fp x3 = t0 + t0;
     t0 = x3 + t0;

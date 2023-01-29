@@ -186,11 +186,11 @@ Fp2 Fp2::operator-() const {
     };
 }
 
-Fp Fp2::getC0() const {
+Fp Fp2::get_c0() const {
     return this->c0;
 }
 
-Fp Fp2::getC1() const {
+Fp Fp2::get_c1() const {
     return this->c1;
 }
 

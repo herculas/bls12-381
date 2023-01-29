@@ -11,6 +11,7 @@ namespace bls12_381::field {
 class Fp {
 public:
     static constexpr int32_t WIDTH = 6;
+    static constexpr int32_t BYTE_SIZE = Fp::WIDTH * sizeof(uint64_t);
 
 private:
     std::array<uint64_t, Fp::WIDTH> data;
@@ -27,13 +28,13 @@ public:
 
     static Fp montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts);
     static Fp sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b);
-    static std::optional<Fp> from_bytes(const std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> &bytes);
+    static std::optional<Fp> from_bytes(const std::array<uint8_t, Fp::BYTE_SIZE> &bytes);
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;
 
     [[nodiscard]] std::string getHex() const;
-    [[nodiscard]] std::array<uint8_t, Fp::WIDTH * sizeof(uint64_t)> to_bytes() const;
+    [[nodiscard]] std::array<uint8_t, Fp::BYTE_SIZE> to_bytes() const;
 
     [[nodiscard]] Fp square() const;
     [[nodiscard]] Fp subtract_modulus() const;

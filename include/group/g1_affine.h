@@ -3,14 +3,16 @@
 
 #include "field/fp.h"
 
-namespace bls12_381 {
-namespace scalar { class Scalar; }
-namespace group { class G1Projective; }
-}
+namespace bls12_381::scalar { class Scalar; }
+namespace bls12_381::group { class G1Projective; }
 
 namespace bls12_381::group {
 
 class G1Affine {
+public:
+    static constexpr int32_t WIDTH = field::Fp::WIDTH;
+    static constexpr int32_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
+
 private:
     field::Fp x;
     field::Fp y;
@@ -28,21 +30,22 @@ public:
     static G1Affine identity();
     static G1Affine generator();
 
-    static std::optional<G1Affine> from_compressed(const std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t)> &bytes);
-    static std::optional<G1Affine> from_compressed_unchecked(const std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t)> &bytes);
-    static std::optional<G1Affine> from_uncompressed(const std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t) * 2> &bytes);
-    static std::optional<G1Affine> from_uncompressed_unchecked(const std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t) * 2> &bytes);
+    static std::optional<G1Affine> from_compressed(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes);
+    static std::optional<G1Affine> from_compressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes);
+    static std::optional<G1Affine> from_uncompressed(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
+    static std::optional<G1Affine> from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
 
-    [[nodiscard]] field::Fp getX() const;
-    [[nodiscard]] field::Fp getY() const;
+    [[nodiscard]] field::Fp get_x() const;
+    [[nodiscard]] field::Fp get_y() const;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
     [[nodiscard]] bool is_torsion_free() const;
 
-    [[nodiscard]] std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t)> to_compressed() const;
-    [[nodiscard]] std::array<uint8_t, field::Fp::WIDTH * sizeof(uint64_t) * 2> to_uncompressed() const;
+    [[nodiscard]] std::array<uint8_t, G1Affine::BYTE_SIZE> to_compressed() const;
+    [[nodiscard]] std::array<uint8_t, G1Affine::BYTE_SIZE * 2> to_uncompressed() const;
 
+private:
     [[nodiscard]] G1Affine endomorphism() const;
 
 public:

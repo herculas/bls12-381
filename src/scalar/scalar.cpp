@@ -2,6 +2,8 @@
 
 #include "group/g1_affine.h"
 #include "group/g1_projective.h"
+#include "group/g2_affine.h"
+#include "group/g2_projective.h"
 #include "scalar/constant.h"
 #include "utils/arith.h"
 #include "utils/bit.h"
@@ -29,7 +31,7 @@ Scalar Scalar::one() {
 }
 
 Scalar Scalar::random() {
-    std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t) * 2> bytes{};
+    std::array<uint8_t, Scalar::BYTE_SIZE * 2> bytes{};
     for (uint8_t &byte: bytes) byte = bls12_381::util::random::getRandom<uint8_t>();
     return Scalar::from_bytes_wide(bytes);
 }
@@ -57,7 +59,7 @@ Scalar Scalar::from_raw(const std::array<uint64_t, Scalar::WIDTH> &values) {
     return Scalar(values) * constant::R2;
 }
 
-Scalar Scalar::from_bytes_wide(const std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t) * 2> &bytes) {
+Scalar Scalar::from_bytes_wide(const std::array<uint8_t, Scalar::BYTE_SIZE * 2> &bytes) {
     std::array<std::array<uint8_t, sizeof(uint64_t)>, Scalar::WIDTH * 2> array{};
     std::array<uint64_t, Scalar::WIDTH * 2> data{};
 
@@ -69,7 +71,7 @@ Scalar Scalar::from_bytes_wide(const std::array<uint8_t, Scalar::WIDTH * sizeof(
     return Scalar::reduce(data);
 }
 
-std::optional<Scalar> Scalar::from_bytes(const std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> &bytes) {
+std::optional<Scalar> Scalar::from_bytes(const std::array<uint8_t, Scalar::BYTE_SIZE> &bytes) {
     std::array<std::array<uint8_t, sizeof(uint64_t)>, Scalar::WIDTH> array{};
     std::array<uint64_t, Scalar::WIDTH> data{};
 
@@ -103,7 +105,7 @@ bool Scalar::is_zero() const {
 }
 
 std::string Scalar::getHex() const {
-    std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> bytes = this->to_bytes();
+    std::array<uint8_t, Scalar::BYTE_SIZE> bytes = this->to_bytes();
     std::reverse(bytes.begin(), bytes.end());
 
     std::string res = "0x";
@@ -112,7 +114,7 @@ std::string Scalar::getHex() const {
     return res;
 }
 
-std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> Scalar::to_bytes() const {
+std::array<uint8_t, Scalar::BYTE_SIZE> Scalar::to_bytes() const {
     std::array<uint64_t, Scalar::WIDTH * 2> contents{0};
     for (int i = 0; i < std::size(contents); ++i)
         if (i < Scalar::WIDTH)
@@ -121,7 +123,7 @@ std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> Scalar::to_bytes() const {
     Scalar point = Scalar::montgomery_reduce(contents);
 
     std::array<uint8_t, sizeof(uint64_t)> temp{};
-    std::array<uint8_t, Scalar::WIDTH * sizeof(uint64_t)> bytes{0};
+    std::array<uint8_t, Scalar::BYTE_SIZE> bytes{0};
 
     for (int i = 0; i < Scalar::WIDTH; ++i) {
         temp = bls12_381::util::bit_operation::uint64_to_le_bytes(point.data[i]);
@@ -405,4 +407,13 @@ group::G1Projective operator*(const Scalar &a, const group::G1Affine &b) {
 group::G1Projective operator*(const Scalar &a, const group::G1Projective &b) {
     return group::G1Projective(b) *= a;
 }
+
+group::G2Projective operator*(const Scalar &a, const group::G2Affine &b) {
+    return group::G2Projective(b) *= a;
+}
+
+group::G2Projective operator*(const Scalar &a, const group::G2Projective &b) {
+    return group::G2Projective(b) *= a;
+}
+
 } // namespace bls12_381::scalar
