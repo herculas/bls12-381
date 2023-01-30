@@ -6,7 +6,9 @@
 
 namespace bls12_381::util::random {
 
+// TODO: Should be enhanced.
 template<typename T>
+requires std::is_integral<T>::value
 T getRandom(T max = std::numeric_limits<T>::max()) noexcept {
     std::random_device device;
     std::default_random_engine randomEngine(device());
@@ -16,4 +18,4 @@ T getRandom(T max = std::numeric_limits<T>::max()) noexcept {
 
 } // namespace bls12_381::util::random
 
-#endif //BLS12_381_RANDOM_H\
+#endif //BLS12_381_RANDOM_H

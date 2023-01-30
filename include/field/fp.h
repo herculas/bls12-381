@@ -55,7 +55,7 @@ public:
     Fp &operator*=(const Fp &rhs);
 
 public:
-    friend inline Fp operator+(const Fp &a, const Fp &b) { return Fp{a} += b; }
+    friend inline Fp operator+(const Fp &a, const Fp &b) { return Fp(a) += b; }
     friend inline Fp operator-(const Fp &a, const Fp &b) { return Fp(a) -= b; }
     friend inline Fp operator*(const Fp &a, const Fp &b) { return Fp(a) *= b; }
 

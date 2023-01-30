@@ -125,6 +125,14 @@ TEST(TestFp, Lexical) {
     EXPECT_TRUE(c.lexicographically_largest());
 }
 
+TEST(TestFp, Random) {
+    bls12_381::field::Fp r;
+    for (int i = 0; i < 20; ++i) {
+        r = bls12_381::field::Fp::random();
+        std::clog << r.getHex() << std::endl;
+    }
+}
+
 TEST(TestFp, Str) {
     bls12_381::field::Fp a({
                                    0x5360bb5978678032, 0x7dd275ae799e128e, 0x5c5b5071ce4f4dcf,

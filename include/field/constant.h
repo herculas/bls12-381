@@ -64,14 +64,14 @@ const Fp2 B2{
 const Fp2 B3{
         Fp(
                 {
-                        0x4476000000275400, 0xdcb8009a43480000, 0x6f7ee9ce4a6e8c00,
-                        0xb10330b7c0a95800, 0x6140b1fcfb1e5400, 0x0381be097f0bb4e0,
+                        0x447600000027552e, 0xdcb8009a43480020, 0x6f7ee9ce4a6e8b59,
+                        0xb10330b7c0a95bc6, 0x6140b1fcfb1e54b7, 0x0381be097f0bb4e1,
                 }
         ),
         Fp(
                 {
-                        0x4476000000275400, 0xdcb8009a43480000, 0x6f7ee9ce4a6e8c00,
-                        0xb10330b7c0a95800, 0x6140b1fcfb1e5400, 0x0381be097f0bb4e0,
+                        0x447600000027552e, 0xdcb8009a43480020, 0x6f7ee9ce4a6e8b59,
+                        0xb10330b7c0a95bc6, 0x6140b1fcfb1e54b7, 0x0381be097f0bb4e1,
                 }
         ),
 };
