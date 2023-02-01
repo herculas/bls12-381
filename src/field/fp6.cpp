@@ -40,6 +40,18 @@ Fp6 Fp6::random() {
     };
 }
 
+Fp2 Fp6::get_c0() const {
+    return this->c0;
+}
+
+Fp2 Fp6::get_c1() const {
+    return this->c1;
+}
+
+Fp2 Fp6::get_c2() const {
+    return this->c2;
+}
+
 bool Fp6::is_zero() const {
     return this->c0.is_zero() && this->c1.is_zero() && this->c2.is_zero();
 }

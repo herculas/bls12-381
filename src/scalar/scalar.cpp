@@ -1,9 +1,5 @@
 #include "scalar/scalar.h"
 
-#include "group/g1_affine.h"
-#include "group/g1_projective.h"
-#include "group/g2_affine.h"
-#include "group/g2_projective.h"
 #include "scalar/constant.h"
 #include "utils/arith.h"
 #include "utils/bit.h"

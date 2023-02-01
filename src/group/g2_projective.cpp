@@ -334,4 +334,4 @@ G2Projective &G2Projective::operator*=(const scalar::Scalar &rhs) {
     return *this;
 }
 
-}
+} // namespace bls12_381::group

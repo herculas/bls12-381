@@ -223,4 +223,4 @@ G2Projective operator*(const G2Affine &a, const scalar::Scalar &b) {
     return G2Projective(a) *= b;
 }
 
-}
+} // namespace bls12_381::group

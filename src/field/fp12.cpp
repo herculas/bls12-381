@@ -41,6 +41,14 @@ Fp12 Fp12::random() {
     };
 }
 
+Fp6 Fp12::get_c0() const {
+    return this->c0;
+}
+
+Fp6 Fp12::get_c1() const {
+    return this->c1;
+}
+
 bool Fp12::is_zero() const {
     return this->c0.is_zero() && this->c1.is_zero();
 }

@@ -5,12 +5,10 @@
 #include <cstdint>
 #include <optional>
 
-namespace bls12_381::group {
-class G1Affine;
-class G2Affine;
-class G1Projective;
-class G2Projective;
-}
+#include "group/g1_affine.h"
+#include "group/g1_projective.h"
+#include "group/g2_affine.h"
+#include "group/g2_projective.h"
 
 namespace bls12_381::scalar {
 

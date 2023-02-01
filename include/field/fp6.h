@@ -26,6 +26,10 @@ public:
     static Fp6 one();
     static Fp6 random();
 
+    [[nodiscard]] Fp2 get_c0() const;
+    [[nodiscard]] Fp2 get_c1() const;
+    [[nodiscard]] Fp2 get_c2() const;
+
     [[nodiscard]] bool is_zero() const;
 
     [[nodiscard]] Fp6 square() const;
