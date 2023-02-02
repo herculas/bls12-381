@@ -1,5 +1,5 @@
-#ifndef BLS12_381_MILLER_LOOP_H
-#define BLS12_381_MILLER_LOOP_H
+#ifndef BLS12_381_MILLER_LOOP_RESULT_H
+#define BLS12_381_MILLER_LOOP_RESULT_H
 
 #include "field/fp12.h"
 #include "group/gt.h"
@@ -16,6 +16,7 @@ public:
     explicit MillerLoopResult(field::Fp12 &&data);
 
     group::Gt final_exponentiation();
+    [[nodiscard]] field::Fp12 get_data() const;
 
 public:
     MillerLoopResult &operator+=(const MillerLoopResult &rhs);
@@ -28,4 +29,4 @@ public:
 
 } // namespace bls12_381::pairing
 
-#endif //BLS12_381_MILLER_LOOP_H
+#endif //BLS12_381_MILLER_LOOP_RESULT_H

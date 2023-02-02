@@ -2,7 +2,7 @@
 
 namespace bls12_381::pairing {
 
-std::array<field::Fp2, 3> doubling_step(group::G2Projective &point) {
+std::tuple<field::Fp2, field::Fp2, field::Fp2> doubling_step(group::G2Projective &point) {
     field::Fp2 tmp0 = point.get_x().square();
     field::Fp2 tmp1 = point.get_y().square();
     field::Fp2 tmp2 = tmp1.square();
@@ -39,7 +39,7 @@ std::array<field::Fp2, 3> doubling_step(group::G2Projective &point) {
     return {tmp0, tmp3, tmp6};
 }
 
-std::array<field::Fp2, 3> addition_step(group::G2Projective &r, const group::G2Affine &q) {
+std::tuple<field::Fp2, field::Fp2, field::Fp2> addition_step(group::G2Projective &r, const group::G2Affine &q) {
     field::Fp2 z_squared = r.get_z().square();
     field::Fp2 y_squared = q.get_y().square();
     field::Fp2 t0 = z_squared * q.get_x();

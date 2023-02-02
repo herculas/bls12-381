@@ -1,6 +1,6 @@
 #include "group/gt.h"
 #include "scalar/scalar.h"
-#include "pairing/miller_loop.h"
+#include "pairing/miller_loop_result.h"
 
 namespace bls12_381::group {
 

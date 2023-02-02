@@ -1,4 +1,4 @@
-#include "pairing/miller_loop.h"
+#include "pairing/miller_loop_result.h"
 
 #include <tuple>
 #include "field/fp2.h"
@@ -114,6 +114,10 @@ group::Gt MillerLoopResult::final_exponentiation() {
 MillerLoopResult &MillerLoopResult::operator+=(const MillerLoopResult &rhs) {
     *this = MillerLoopResult{this->data * rhs.data};
     return *this;
+}
+
+field::Fp12 MillerLoopResult::get_data() const {
+    return this->data;
 }
 
 } // namespace bls12_381::pairing
