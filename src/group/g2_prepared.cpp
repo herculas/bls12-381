@@ -1,5 +1,6 @@
 #include "group/g2_prepared.h"
 
+#include <cassert>
 #include <vector>
 
 #include "field/fp2.h"

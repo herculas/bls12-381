@@ -1,6 +1,8 @@
 #include "pairing/miller_loop_result.h"
 
+#include <cassert>
 #include <tuple>
+
 #include "field/fp2.h"
 #include "group/constant.h"
 

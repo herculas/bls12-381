@@ -1,5 +1,7 @@
 #include "group/g1_projective.h"
 
+#include <cassert>
+
 #include "field/constant.h"
 #include "group/constant.h"
 #include "group/g1_affine.h"
