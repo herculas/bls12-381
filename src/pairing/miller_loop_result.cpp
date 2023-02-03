@@ -77,7 +77,9 @@ field::Fp12 cyclotomic_exp(const field::Fp12 &point) {
 
 group::Gt MillerLoopResult::final_exponentiation() {
     field::Fp12 f = this->data;
-    field::Fp12 t0 = f.frobenius_map().frobenius_map().frobenius_map().frobenius_map().frobenius_map().frobenius_map();
+    field::Fp12 t0 = f
+            .frobenius_map().frobenius_map().frobenius_map()
+            .frobenius_map().frobenius_map().frobenius_map();
 
     assert(f.invert().has_value());
 

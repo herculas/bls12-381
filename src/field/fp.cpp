@@ -1,5 +1,7 @@
 #include "field/fp.h"
 
+#include <cassert>
+
 #include "field/constant.h"
 #include "utils/arith.h"
 #include "utils/bit.h"
