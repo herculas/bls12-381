@@ -4,13 +4,17 @@ namespace bls12_381::field {
 
 Fp12::Fp12() : c0{Fp6::zero()}, c1{Fp6::zero()} {}
 
-Fp12::Fp12(Fp &&fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+Fp12::Fp12(const Fp12 &fp) = default;
+
+Fp12::Fp12(Fp12 &&fp) noexcept = default;
+
+Fp12::Fp12(Fp &&fp) : c0{Fp6{fp}}, c1{Fp6::zero()} {}
 
 Fp12::Fp12(Fp2 &&fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
 
-Fp12::Fp12(Fp6 &&fp) : c0{fp}, c1{Fp6::zero()} {}
+Fp12::Fp12(Fp6 &&fp) : c0{std::move(fp)}, c1{Fp6::zero()} {}
 
-Fp12::Fp12(Fp6 &&fp0, Fp6 &&fp1) : c0{fp0}, c1{fp1} {}
+Fp12::Fp12(Fp6 &&fp0, Fp6 &&fp1) : c0{std::move(fp0)}, c1{std::move(fp1)} {}
 
 Fp12::Fp12(const Fp &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
 
@@ -20,32 +24,32 @@ Fp12::Fp12(const Fp6 &fp) : c0{fp}, c1{Fp6::zero()} {}
 
 Fp12::Fp12(const Fp6 &fp0, const Fp6 &fp1) : c0{fp0}, c1{fp1} {}
 
-Fp12 Fp12::zero() {
+Fp12 Fp12::zero() noexcept {
     return Fp12{
             Fp6::zero(),
             Fp6::zero(),
     };
 }
 
-Fp12 Fp12::one() {
+Fp12 Fp12::one() noexcept {
     return Fp12{
             Fp6::one(),
             Fp6::zero(),
     };
 }
 
-Fp12 Fp12::random() {
+Fp12 Fp12::random() noexcept {
     return Fp12{
             Fp6::random(),
             Fp6::random(),
     };
 }
 
-Fp6 Fp12::get_c0() const {
+Fp6 Fp12::get_c0() const noexcept {
     return this->c0;
 }
 
-Fp6 Fp12::get_c1() const {
+Fp6 Fp12::get_c1() const noexcept {
     return this->c1;
 }
 
@@ -54,8 +58,8 @@ bool Fp12::is_zero() const {
 }
 
 Fp12 Fp12::square() const {
-    Fp6 mul = this->c0 * this->c1;
-    Fp6 add = this->c0 + this->c1;
+    const Fp6 mul = this->c0 * this->c1;
+    const Fp6 add = this->c0 + this->c1;
 
     Fp6 s0 = (this->c1.mul_by_non_residue() + this->c0) * add - mul - mul.mul_by_non_residue();
     Fp6 s1 = mul + mul;
@@ -89,8 +93,8 @@ Fp12 Fp12::frobenius_map() const {
 }
 
 Fp12 Fp12::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp4) const {
-    Fp6 aa = this->c0.mul_by_fp2(fp0, fp1);
-    Fp6 bb = this->c1.mul_by_fp2(fp4);
+    const Fp6 aa = this->c0.mul_by_fp2(fp0, fp1);
+    const Fp6 bb = this->c1.mul_by_fp2(fp4);
 
     Fp6 s0 = bb.mul_by_non_residue() + aa;
     Fp6 s1 = (this->c1 + this->c0).mul_by_fp2(fp0, fp1 + fp4) - aa - bb;
@@ -115,6 +119,13 @@ Fp12 &Fp12::operator=(const Fp12 &rhs) {
     return *this;
 }
 
+Fp12 &Fp12::operator=(Fp12 &&rhs) noexcept {
+    if (this == &rhs) return *this;
+    this->c0 = rhs.c0;
+    this->c1 = rhs.c1;
+    return *this;
+}
+
 Fp12 &Fp12::operator+=(const Fp12 &rhs) {
     *this = Fp12{
             this->c0 + rhs.c0,
@@ -132,8 +143,8 @@ Fp12 &Fp12::operator-=(const Fp12 &rhs) {
 }
 
 Fp12 &Fp12::operator*=(const Fp12 &rhs) {
-    Fp6 aa = this->c0 * rhs.c0;
-    Fp6 bb = this->c1 * rhs.c1;
+    const Fp6 aa = this->c0 * rhs.c0;
+    const Fp6 bb = this->c1 * rhs.c1;
 
     Fp6 s0 = bb.mul_by_non_residue() + aa;
     Fp6 s1 = (this->c1 + this->c0) * (rhs.c0 + rhs.c1) - aa - bb;

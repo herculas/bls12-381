@@ -12,21 +12,25 @@ namespace bls12_381::field {
 
 Fp::Fp() : data{0} {}
 
+Fp::Fp(const Fp &fp) = default;
+
+Fp::Fp(Fp &&fp) noexcept = default;
+
 Fp::Fp(uint64_t val) : data{val} {}
 
 Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) : data{data} {}
 
 Fp::Fp(const std::array<uint64_t, Fp::WIDTH> &data) : data{data} {}
 
-Fp Fp::zero() {
+Fp Fp::zero() noexcept {
     return Fp{};
 }
 
-Fp Fp::one() {
+Fp Fp::one() noexcept {
     return constant::R1;
 }
 
-Fp Fp::random() {
+Fp Fp::random() noexcept {
     std::array<uint64_t, Fp::WIDTH * 2> randoms{};
     for (uint64_t &random: randoms) random = bls12_381::util::random::getRandom<uint64_t>();
     return Fp::reduce(randoms);
@@ -54,14 +58,13 @@ Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
 
 Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
     assert(a.size() == b.size());
-    auto len = static_cast<int32_t>(a.size());
+    const auto len = static_cast<int32_t>(a.size());
 
     uint64_t u[Fp::WIDTH] = {0};
 
     for (int j = 0; j < Fp::WIDTH; ++j) {
         uint64_t t[Fp::WIDTH + 1] = {0};
-        for (int i = 0; i < Fp::WIDTH; ++i) t[i] = u[i];
-
+        std::copy(u, u + Fp::WIDTH, t);
         for (int i = 0; i < len; ++i) {
             uint64_t carry = 0;
             for (int k = 0; k < Fp::WIDTH; ++k)
@@ -147,12 +150,11 @@ bool Fp::lexicographically_largest() const {
 /// Converts an element of `Fp` into a big-endian byte array.
 std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     std::array<uint64_t, Fp::WIDTH * 2> contents{0};
-    for (int i = 0; i < std::size(contents); ++i)
-        if (i < WIDTH)
+    for (int i = 0; i < Fp::WIDTH; ++i)
             contents[i] = this->data[i];
 
     // turn this into canonical form by computing (a.R) / R = a.
-    Fp point = Fp::montgomery_reduce(contents);
+    const Fp point = Fp::montgomery_reduce(contents);
 
     std::array<uint8_t, sizeof(uint64_t)> temp{};
     std::array<uint8_t, Fp::BYTE_SIZE> bytes{0};
@@ -217,7 +219,7 @@ Fp Fp::subtract_modulus() const {
 
     // If underflow occurs on the final limb, borrow = 0xfff...fff, otherwise borrow = 0x000...000.
     // Thus, we use it as a mask.
-    uint64_t borrow_flip = borrow ^ 0xffffffffffffffff;
+    const uint64_t borrow_flip = borrow ^ 0xffffffffffffffff;
 
     for (int i = 0; i < Fp::WIDTH; ++i) {
         d[i] = (this->data[i] & borrow) | (r[i] & borrow_flip);
@@ -238,12 +240,11 @@ Fp Fp::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
 }
 
 std::optional<Fp> Fp::sqrt() const {
-    std::array<uint64_t, Fp::WIDTH> exp = {
+    const std::array<uint64_t, Fp::WIDTH> exp = {
             0xee7fbfffffffeaab, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
             0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6,
     };
-
-    Fp sqrt = this->pow_vartime(exp);
+    const Fp sqrt = this->pow_vartime(exp);
 
     if (sqrt.square() == *this) {
         return sqrt;
@@ -256,12 +257,11 @@ std::optional<Fp> Fp::sqrt() const {
 /// Returns `null` when this element is zero.
 std::optional<Fp> Fp::invert() const {
     // modulus - 2
-    std::array<uint64_t, Fp::WIDTH> exp = {
+    const std::array<uint64_t, Fp::WIDTH> exp = {
             0xb9feffffffffaaa9, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
             0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a,
     };
-
-    Fp result = this->pow_vartime(exp);
+    const Fp result = this->pow_vartime(exp);
 
     if (this->is_zero()) {
         return std::nullopt;
@@ -272,15 +272,20 @@ std::optional<Fp> Fp::invert() const {
 
 /// Reduces a big-endian 64-bit limb representation of a 768-bit number.
 Fp Fp::reduce(const std::array<uint64_t, Fp::WIDTH * 2> &limbs) {
-    Fp d1({limbs[11], limbs[10], limbs[9], limbs[8], limbs[7], limbs[6]});
-    Fp d0({limbs[5], limbs[4], limbs[3], limbs[2], limbs[1], limbs[0]});
+    const Fp d1({limbs[11], limbs[10], limbs[9], limbs[8], limbs[7], limbs[6]});
+    const Fp d0({limbs[5], limbs[4], limbs[3], limbs[2], limbs[1], limbs[0]});
     return d0 * constant::R2 + d1 * constant::R3;
 }
 
 Fp &Fp::operator=(const Fp &rhs) {
     if (this == &rhs) return *this;
-    for (int i = 0; i < this->data.size(); ++i)
-        this->data[i] = rhs.data[i];
+    this->data = rhs.data;
+    return *this;
+}
+
+Fp &Fp::operator=(Fp &&rhs) noexcept {
+    if (this == &rhs) return *this;
+    this->data = rhs.data;
     return *this;
 }
 

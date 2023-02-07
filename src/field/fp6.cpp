@@ -4,11 +4,9 @@ namespace bls12_381::field {
 
 Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp &&fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp6 &fp) = default;
 
-Fp6::Fp6(Fp2 &&fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
-
-Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
+Fp6::Fp6(Fp6 &&fp) noexcept = default;
 
 Fp6::Fp6(const Fp &fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
@@ -16,7 +14,13 @@ Fp6::Fp6(const Fp2 &fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
 Fp6::Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
 
-Fp6 Fp6::zero() {
+Fp6::Fp6(Fp &&fp) : c0{Fp2{fp}}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
+Fp6::Fp6(Fp2 &&fp) : c0{std::move(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+
+Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) : c0{std::move(fp0)}, c1{std::move(fp1)}, c2{std::move(fp2)} {}
+
+Fp6 Fp6::zero() noexcept {
     return Fp6{
             Fp2::zero(),
             Fp2::zero(),
@@ -24,7 +28,7 @@ Fp6 Fp6::zero() {
     };
 }
 
-Fp6 Fp6::one() {
+Fp6 Fp6::one() noexcept {
     return Fp6{
             Fp2::one(),
             Fp2::zero(),
@@ -32,7 +36,7 @@ Fp6 Fp6::one() {
     };
 }
 
-Fp6 Fp6::random() {
+Fp6 Fp6::random() noexcept {
     return Fp6{
             Fp2::random(),
             Fp2::random(),
@@ -40,15 +44,15 @@ Fp6 Fp6::random() {
     };
 }
 
-Fp2 Fp6::get_c0() const {
+Fp2 Fp6::get_c0() const noexcept {
     return this->c0;
 }
 
-Fp2 Fp6::get_c1() const {
+Fp2 Fp6::get_c1() const noexcept {
     return this->c1;
 }
 
-Fp2 Fp6::get_c2() const {
+Fp2 Fp6::get_c2() const noexcept {
     return this->c2;
 }
 
@@ -57,13 +61,13 @@ bool Fp6::is_zero() const {
 }
 
 Fp6 Fp6::square() const {
-    Fp2 s0 = this->c0.square();
-    Fp2 ab = this->c0 * this->c1;
-    Fp2 s1 = ab + ab;
-    Fp2 s2 = (this->c0 - this->c1 + this->c2).square();
-    Fp2 bc = this->c1 * this->c2;
-    Fp2 s3 = bc + bc;
-    Fp2 s4 = this->c2.square();
+    const Fp2 s0 = this->c0.square();
+    const Fp2 ab = this->c0 * this->c1;
+    const Fp2 s1 = ab + ab;
+    const Fp2 s2 = (this->c0 - this->c1 + this->c2).square();
+    const Fp2 bc = this->c1 * this->c2;
+    const Fp2 s3 = bc + bc;
+    const Fp2 s4 = this->c2.square();
 
     return Fp6{
             s3.mul_by_non_residue() + s0,
@@ -81,8 +85,8 @@ Fp6 Fp6::mul_by_fp2(const Fp2 &fp) const {
 }
 
 Fp6 Fp6::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1) const {
-    Fp2 a_a = this->c0 * fp0;
-    Fp2 b_b = this->c1 * fp1;
+    const Fp2 a_a = this->c0 * fp0;
+    const Fp2 b_b = this->c1 * fp1;
 
     Fp2 t1 = (this->c2 * fp1).mul_by_non_residue() + a_a;
     Fp2 t2 = (fp0 + fp1) * (this->c0 + this->c1) - a_a - b_b;
@@ -92,11 +96,11 @@ Fp6 Fp6::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1) const {
 }
 
 Fp6 Fp6::mul_interleaved(const Fp6 &b) const {
-    Fp6 a = *this;
-    Fp b10_p_b11 = b.c1.get_c0() + b.c1.get_c1();
-    Fp b10_m_b11 = b.c1.get_c0() - b.c1.get_c1();
-    Fp b20_p_b21 = b.c2.get_c0() + b.c2.get_c1();
-    Fp b20_m_b21 = b.c2.get_c0() - b.c2.get_c1();
+    const Fp6 a = *this;
+    const Fp b10_p_b11 = b.c1.get_c0() + b.c1.get_c1();
+    const Fp b10_m_b11 = b.c1.get_c0() - b.c1.get_c1();
+    const Fp b20_p_b21 = b.c2.get_c0() + b.c2.get_c1();
+    const Fp b20_m_b21 = b.c2.get_c0() - b.c2.get_c1();
 
     auto c000 = {a.c0.get_c0(), -a.c0.get_c1(), a.c1.get_c0(), -a.c1.get_c1(), a.c2.get_c0(), -a.c2.get_c1()};
     auto c001 = {b.c0.get_c0(), b.c0.get_c1(), b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11};
@@ -161,11 +165,11 @@ Fp6 Fp6::mul_by_non_residue() const {
 }
 
 std::optional<Fp6> Fp6::invert() const {
-    Fp2 s0 = this->c0.square() - (this->c1 * this->c2).mul_by_non_residue();
-    Fp2 s1 = this->c2.square().mul_by_non_residue() - (this->c0 * this->c1);
-    Fp2 s2 = this->c1.square() - (this->c0 * this->c2);
+    const Fp2 s0 = this->c0.square() - (this->c1 * this->c2).mul_by_non_residue();
+    const Fp2 s1 = this->c2.square().mul_by_non_residue() - (this->c0 * this->c1);
+    const Fp2 s2 = this->c1.square() - (this->c0 * this->c2);
 
-    Fp2 temp = ((this->c1 * s2) + (this->c2 * s1)).mul_by_non_residue() + (this->c0 * s0);
+    const Fp2 temp = ((this->c1 * s2) + (this->c2 * s1)).mul_by_non_residue() + (this->c0 * s0);
     std::optional<Fp2> res = temp.invert();
     if (!res.has_value()) return std::nullopt;
     return Fp6{
@@ -176,6 +180,14 @@ std::optional<Fp6> Fp6::invert() const {
 }
 
 Fp6 &Fp6::operator=(const Fp6 &rhs) {
+    if (this == &rhs) return *this;
+    this->c0 = rhs.c0;
+    this->c1 = rhs.c1;
+    this->c2 = rhs.c2;
+    return *this;
+}
+
+Fp6 &Fp6::operator=(Fp6 &&rhs) noexcept {
     if (this == &rhs) return *this;
     this->c0 = rhs.c0;
     this->c1 = rhs.c1;

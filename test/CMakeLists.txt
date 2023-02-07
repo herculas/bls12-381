@@ -16,8 +16,8 @@ ADD_EXECUTABLE(
 
 TARGET_LINK_LIBRARIES(
         BLS_TEST
-        GTest::gtest_main
-        BLS12_381
+        PRIVATE GTest::gtest_main
+        PRIVATE BLS12_381
 )
 
 INCLUDE(GoogleTest)

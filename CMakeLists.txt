@@ -14,6 +14,5 @@ ADD_LIBRARY(
 # Add headers
 TARGET_INCLUDE_DIRECTORIES(
         BLS12_381
-        PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+        PUBLIC ${PROJECT_SOURCE_DIR}/include
 )

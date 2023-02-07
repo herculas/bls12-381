@@ -13,22 +13,24 @@ private:
 
 public:
     Fp6();
-
-    explicit Fp6(Fp &&fp);
-    explicit Fp6(Fp2 &&fp);
-    explicit Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2);
+    Fp6(const Fp6 &fp);
+    Fp6(Fp6 &&fp) noexcept;
 
     explicit Fp6(const Fp &fp);
     explicit Fp6(const Fp2 &fp);
     explicit Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2);
 
-    static Fp6 zero();
-    static Fp6 one();
-    static Fp6 random();
+    explicit Fp6(Fp &&fp);
+    explicit Fp6(Fp2 &&fp);
+    explicit Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2);
 
-    [[nodiscard]] Fp2 get_c0() const;
-    [[nodiscard]] Fp2 get_c1() const;
-    [[nodiscard]] Fp2 get_c2() const;
+    static Fp6 zero() noexcept;
+    static Fp6 one() noexcept;
+    static Fp6 random() noexcept;
+
+    [[nodiscard]] Fp2 get_c0() const noexcept;
+    [[nodiscard]] Fp2 get_c1() const noexcept;
+    [[nodiscard]] Fp2 get_c2() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
 
@@ -46,6 +48,7 @@ private:
 public:
     Fp6 operator-() const;
     Fp6 &operator=(const Fp6 &rhs);
+    Fp6 &operator=(Fp6 &&rhs) noexcept;
 
     Fp6 &operator+=(const Fp6 &rhs);
     Fp6 &operator-=(const Fp6 &rhs);

@@ -12,19 +12,20 @@ private:
 
 public:
     Fp2();
-
-    explicit Fp2(Fp &&fp);
-    explicit Fp2(Fp &&fp0, Fp &&fp1);
+    Fp2(const Fp2 &fp);
+    Fp2(Fp2 &&fp) noexcept;
 
     explicit Fp2(const Fp &fp);
     explicit Fp2(const Fp &fp0, const Fp &fp1);
+    explicit Fp2(Fp &&fp);
+    explicit Fp2(Fp &&fp0, Fp &&fp1);
 
-    static Fp2 zero();
-    static Fp2 one();
-    static Fp2 random();
+    static Fp2 zero() noexcept;
+    static Fp2 one() noexcept;
+    static Fp2 random() noexcept;
 
-    [[nodiscard]] Fp get_c0() const;
-    [[nodiscard]] Fp get_c1() const;
+    [[nodiscard]] Fp get_c0() const noexcept;
+    [[nodiscard]] Fp get_c1() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;
@@ -43,6 +44,7 @@ public:
 public:
     Fp2 operator-() const;
     Fp2 &operator=(const Fp2 &rhs);
+    Fp2 &operator=(Fp2 &&rhs) noexcept;
 
     Fp2 &operator+=(const Fp2 &rhs);
     Fp2 &operator-=(const Fp2 &rhs);

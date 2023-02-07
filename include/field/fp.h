@@ -19,13 +19,16 @@ private:
 
 public:
     Fp();
+    Fp(const Fp &fp);
+    Fp(Fp &&fp) noexcept;
+
     explicit Fp(uint64_t val);
     explicit Fp(std::array<uint64_t, Fp::WIDTH> &&data);
     explicit Fp(const std::array<uint64_t, Fp::WIDTH> &data);
 
-    static Fp zero();
-    static Fp one();
-    static Fp random();
+    static Fp zero() noexcept;
+    static Fp one() noexcept;
+    static Fp random() noexcept;
 
     static Fp montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts);
     static Fp sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b);
@@ -49,8 +52,8 @@ private:
 
 public:
     Fp operator-() const;
+    Fp &operator=(Fp &&rhs) noexcept;
     Fp &operator=(const Fp &rhs);
-
     Fp &operator+=(const Fp &rhs);
     Fp &operator-=(const Fp &rhs);
     Fp &operator*=(const Fp &rhs);
@@ -63,6 +66,7 @@ public:
     friend inline bool operator==(const Fp &a, const Fp &b) { return a.data == b.data; }
     friend inline bool operator!=(const Fp &a, const Fp &b) { return a.data != b.data; }
 };
+
 } // namespace bls12_381::field
 
 #endif //BLS12_381_FP_H

@@ -12,23 +12,25 @@ private:
 
 public:
     Fp12();
-
-    explicit Fp12(Fp &&fp);
-    explicit Fp12(Fp2 &&fp);
-    explicit Fp12(Fp6 &&fp);
-    explicit Fp12(Fp6 &&fp0, Fp6 &&fp1);
+    Fp12(const Fp12 &fp);
+    Fp12(Fp12 &&fp) noexcept;
 
     explicit Fp12(const Fp &fp);
     explicit Fp12(const Fp2 &fp);
     explicit Fp12(const Fp6 &fp);
     explicit Fp12(const Fp6 &fp0, const Fp6 &fp1);
 
-    static Fp12 zero();
-    static Fp12 one();
-    static Fp12 random();
+    explicit Fp12(Fp &&fp);
+    explicit Fp12(Fp2 &&fp);
+    explicit Fp12(Fp6 &&fp);
+    explicit Fp12(Fp6 &&fp0, Fp6 &&fp1);
 
-    [[nodiscard]] Fp6 get_c0() const;
-    [[nodiscard]] Fp6 get_c1() const;
+    static Fp12 zero() noexcept;
+    static Fp12 one() noexcept;
+    static Fp12 random() noexcept;
+
+    [[nodiscard]] Fp6 get_c0() const noexcept;
+    [[nodiscard]] Fp6 get_c1() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
 
@@ -42,6 +44,7 @@ public:
 public:
     Fp12 operator-() const;
     Fp12 &operator=(const Fp12 &rhs);
+    Fp12 &operator=(Fp12 &&rhs) noexcept;
 
     Fp12 &operator+=(const Fp12 &rhs);
     Fp12 &operator-=(const Fp12 &rhs);
