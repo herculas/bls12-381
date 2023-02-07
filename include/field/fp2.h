@@ -12,24 +12,25 @@ private:
 
 public:
     Fp2();
-    Fp2(const Fp2 &fp);
-    Fp2(Fp2 &&fp) noexcept;
 
+    Fp2(const Fp2 &fp);
     explicit Fp2(const Fp &fp);
     explicit Fp2(const Fp &fp0, const Fp &fp1);
+
+    Fp2(Fp2 &&fp) noexcept;
     explicit Fp2(Fp &&fp);
     explicit Fp2(Fp &&fp0, Fp &&fp1);
 
     static Fp2 zero() noexcept;
     static Fp2 one() noexcept;
-    static Fp2 random() noexcept;
+    static Fp2 random();
 
     [[nodiscard]] Fp get_c0() const noexcept;
     [[nodiscard]] Fp get_c1() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;
-    [[nodiscard]] std::string getHex() const;
+    [[nodiscard]] std::string to_hex_str() const;
 
     [[nodiscard]] Fp2 square() const;
     [[nodiscard]] Fp2 conjugate() const;

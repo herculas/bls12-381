@@ -10,19 +10,23 @@ namespace bls12_381::scalar {
 
 Scalar::Scalar() : data{0} {}
 
+Scalar::Scalar(const Scalar &scalar) = default;
+
 Scalar::Scalar(uint64_t val) : data{0} {
     *this = Scalar({val, 0, 0, 0}) * constant::R2;
 }
 
-Scalar::Scalar(std::array<uint64_t, Scalar::WIDTH> &&data) : data{data} {}
-
 Scalar::Scalar(const std::array<uint64_t, Scalar::WIDTH> &data) : data{data} {}
 
-Scalar Scalar::zero() {
+Scalar::Scalar(Scalar &&scalar) noexcept = default;
+
+Scalar::Scalar(std::array<uint64_t, Scalar::WIDTH> &&data) : data{data} {}
+
+Scalar Scalar::zero() noexcept {
     return Scalar{};
 }
 
-Scalar Scalar::one() {
+Scalar Scalar::one() noexcept {
     return constant::R1;
 }
 
@@ -37,10 +41,7 @@ Scalar Scalar::montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &
     uint64_t carry = 0;
     uint64_t carry2 = 0;
 
-    std::array<uint64_t, Scalar::WIDTH * 2> r{};
-    for (int i = 0; i < Scalar::WIDTH * 2; ++i)
-        r[i] = ts[i];
-
+    std::array<uint64_t, Scalar::WIDTH * 2> r = ts;
     for (int i = 0; i < Scalar::WIDTH; ++i) {
         k = r[i] * constant::INV;
         std::tie(std::ignore, carry) = bls12_381::util::arithmetic::mac(r[i], k, constant::MODULUS.data[0], 0);
@@ -80,10 +81,10 @@ std::optional<Scalar> Scalar::from_bytes(const std::array<uint8_t, Scalar::BYTE_
 
     uint64_t borrow = 0;
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(std::ignore, borrow) = bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS.data[i],
-                                                                         borrow);
+        std::tie(std::ignore, borrow) =
+                bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS.data[i], borrow);
 
-    uint8_t is_some = static_cast<uint8_t>(borrow) & 1;
+    const uint8_t is_some = static_cast<uint8_t>(borrow) & 1;
     temp *= constant::R2;
 
     if (is_some) {
@@ -105,18 +106,16 @@ std::string Scalar::getHex() const {
     std::reverse(bytes.begin(), bytes.end());
 
     std::string res = "0x";
-    res += bls12_381::util::encoding::hexStr(bytes);
+    res += bls12_381::util::encoding::hex_str(bytes);
 
     return res;
 }
 
 std::array<uint8_t, Scalar::BYTE_SIZE> Scalar::to_bytes() const {
     std::array<uint64_t, Scalar::WIDTH * 2> contents{0};
-    for (int i = 0; i < std::size(contents); ++i)
-        if (i < Scalar::WIDTH)
-            contents[i] = this->data[i];
+    std::copy(this->data.begin(), this->data.begin() + Scalar::WIDTH, contents.begin());
 
-    Scalar point = Scalar::montgomery_reduce(contents);
+    const Scalar point = Scalar::montgomery_reduce(contents);
 
     std::array<uint8_t, sizeof(uint64_t)> temp{};
     std::array<uint8_t, Scalar::BYTE_SIZE> bytes{0};
@@ -184,11 +183,11 @@ Scalar Scalar::pow_vartime(const std::array<uint64_t, Scalar::WIDTH> &exp) const
 }
 
 std::optional<Scalar> Scalar::sqrt() const {
-    std::array<uint64_t, Scalar::WIDTH> exp = {
+    const std::array<uint64_t, Scalar::WIDTH> exp = {
             0x7fff2dff7fffffff, 0x04d0ec02a9ded201,
             0x94cebea4199cec04, 0x0000000039f6d3a9,
     };
-    Scalar w = this->pow_vartime(exp);
+    const Scalar w = this->pow_vartime(exp);
 
     uint32_t v = constant::S;
     Scalar x = *this * w;
@@ -224,9 +223,8 @@ std::optional<Scalar> Scalar::sqrt() const {
     }
 }
 
-void multi_square(Scalar &n, int32_t times) {
-    for (int i = 0; i < times; ++i)
-        n = n.square();
+constexpr void multi_square(Scalar &n, int32_t times) {
+    for (int i = 0; i < times; ++i) n = n.square();
 }
 
 std::optional<Scalar> Scalar::invert() const {
@@ -325,15 +323,20 @@ std::optional<Scalar> Scalar::invert() const {
 }
 
 Scalar Scalar::reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &limbs) {
-    Scalar d0({limbs[0], limbs[1], limbs[2], limbs[3]});
-    Scalar d1({limbs[4], limbs[5], limbs[6], limbs[7]});
+    const Scalar d0({limbs[0], limbs[1], limbs[2], limbs[3]});
+    const Scalar d1({limbs[4], limbs[5], limbs[6], limbs[7]});
     return d0 * constant::R2 + d1 * constant::R3;
 }
 
 Scalar &Scalar::operator=(const Scalar &rhs) {
     if (this == &rhs) return *this;
-    for (int i = 0; i < this->data.size(); ++i)
-        this->data[i] = rhs.data[i];
+    this->data = rhs.data;
+    return *this;
+}
+
+Scalar &Scalar::operator=(Scalar &&rhs) noexcept {
+    if (this == &rhs) return *this;
+    this->data = rhs.data;
     return *this;
 }
 
@@ -383,10 +386,11 @@ Scalar Scalar::operator-() const {
     uint64_t d[Scalar::WIDTH];
 
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(d[i], borrow) = bls12_381::util::arithmetic::sbb(constant::MODULUS.data[i], this->data[i], borrow);
+        std::tie(d[i], borrow) =
+                bls12_381::util::arithmetic::sbb(constant::MODULUS.data[i], this->data[i], borrow);
 
-    bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3]) == 0;
-    uint64_t mask = static_cast<uint64_t>(dec) - 1;
+    const bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3]) == 0;
+    const uint64_t mask = static_cast<uint64_t>(dec) - 1;
 
     return Scalar(
             {

@@ -12,21 +12,27 @@ namespace bls12_381::group {
 
 G1Projective::G1Projective() : x{field::Fp::zero()}, y{field::Fp::one()}, z{field::Fp::zero()} {}
 
-G1Projective::G1Projective(G1Affine &&point) : x{point.get_x()}, y{point.get_y()},
-                                               z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
+G1Projective::G1Projective(const G1Projective &point) = default;
 
-G1Projective::G1Projective(field::Fp &&x, field::Fp &&y, field::Fp &&z) : x{x}, y{y}, z{z} {}
+G1Projective::G1Projective(const G1Affine &point)
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
 
-G1Projective::G1Projective(const G1Affine &point) : x{point.get_x()}, y{point.get_y()},
-                                                    z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
+G1Projective::G1Projective(const field::Fp &x, const field::Fp &y, const field::Fp &z)
+        : x{x}, y{y}, z{z} {}
 
-G1Projective::G1Projective(const field::Fp &x, const field::Fp &y, const field::Fp &z) : x{x}, y{y}, z{z} {}
+G1Projective::G1Projective(G1Projective &&point) noexcept = default;
 
-G1Projective G1Projective::identity() {
+G1Projective::G1Projective(G1Affine &&point)
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
+
+G1Projective::G1Projective(field::Fp &&x, field::Fp &&y, field::Fp &&z)
+        : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
+
+G1Projective G1Projective::identity() noexcept {
     return G1Projective{};
 }
 
-G1Projective G1Projective::generator() {
+G1Projective G1Projective::generator() noexcept {
     return G1Projective{
             field::Fp({
                               0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
@@ -42,13 +48,13 @@ G1Projective G1Projective::generator() {
 
 G1Projective G1Projective::random() {
     while (true) {
-        bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
-        field::Fp rx = field::Fp::random();
-        auto temp = (rx.square() * rx + field::constant::B).sqrt();
+        const bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
+        const field::Fp rx = field::Fp::random();
+        const auto temp = (rx.square() * rx + field::constant::B).sqrt();
         if (!temp.has_value()) continue;
-        field::Fp ry = temp.value();
-        G1Affine point{rx, flip_sign ? -ry : ry, false};
-        G1Projective curve(point);
+        const field::Fp &ry = temp.value();
+        const G1Affine point{rx, flip_sign ? -ry : ry, false};
+        const G1Projective curve(point);
         G1Projective res = curve.clear_cofactor();
         if (!res.is_identity()) return res;
     }
@@ -81,15 +87,15 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     return results;
 }
 
-field::Fp G1Projective::get_x() const {
+field::Fp G1Projective::get_x() const noexcept {
     return this->x;
 }
 
-field::Fp G1Projective::get_y() const {
+field::Fp G1Projective::get_y() const noexcept {
     return this->y;
 }
 
-field::Fp G1Projective::get_z() const {
+field::Fp G1Projective::get_z() const noexcept {
     return this->z;
 }
 
@@ -243,6 +249,14 @@ G1Projective G1Projective::operator-() const {
 }
 
 G1Projective &G1Projective::operator=(const G1Projective &rhs) {
+    if (this == &rhs) return *this;
+    this->x = rhs.x;
+    this->y = rhs.y;
+    this->z = rhs.z;
+    return *this;
+}
+
+G1Projective &G1Projective::operator=(G1Projective &&rhs) noexcept {
     if (this == &rhs) return *this;
     this->x = rhs.x;
     this->y = rhs.y;

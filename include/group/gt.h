@@ -13,11 +13,15 @@ private:
 
 public:
     Gt();
+
+    Gt(const Gt &point);
     explicit Gt(const field::Fp12 &point);
+
+    Gt(Gt &&point) noexcept;
     explicit Gt(field::Fp12 &&point);
 
-    static Gt identity();
-    static Gt generator();
+    static Gt identity() noexcept;
+    static Gt generator() noexcept;
     static Gt random();
 
     [[nodiscard]] bool is_identity() const;
@@ -27,6 +31,7 @@ public:
 public:
     Gt operator-() const;
     Gt &operator=(const Gt &rhs);
+    Gt &operator=(Gt &&rhs) noexcept;
 
     Gt &operator+=(const Gt &rhs);
     Gt &operator-=(const Gt &rhs);

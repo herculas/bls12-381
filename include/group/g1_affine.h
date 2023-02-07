@@ -21,22 +21,24 @@ private:
 public:
     G1Affine();
 
-    explicit G1Affine(G1Projective &&point);
-    explicit G1Affine(field::Fp &&x, field::Fp &&y, bool infinity);
-
+    G1Affine(const G1Affine &point);
     explicit G1Affine(const G1Projective &point);
     explicit G1Affine(const field::Fp &x, const field::Fp &y, bool infinity);
 
-    static G1Affine identity();
-    static G1Affine generator();
+    G1Affine(G1Affine &&point) noexcept;
+    explicit G1Affine(G1Projective &&point);
+    explicit G1Affine(field::Fp &&x, field::Fp &&y, bool infinity);
+
+    static G1Affine identity() noexcept;
+    static G1Affine generator() noexcept;
 
     static std::optional<G1Affine> from_compressed(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes);
     static std::optional<G1Affine> from_compressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes);
     static std::optional<G1Affine> from_uncompressed(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
     static std::optional<G1Affine> from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
 
-    [[nodiscard]] field::Fp get_x() const;
-    [[nodiscard]] field::Fp get_y() const;
+    [[nodiscard]] field::Fp get_x() const noexcept;
+    [[nodiscard]] field::Fp get_y() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
@@ -51,7 +53,7 @@ private:
 public:
     G1Affine operator-() const;
     G1Affine &operator=(const G1Affine &rhs);
-
+    G1Affine &operator=(G1Affine &&rhs) noexcept;
 public:
     friend G1Projective operator+(const G1Affine &a, const G1Projective &b);
     friend G1Projective operator-(const G1Affine &a, const G1Projective &b);

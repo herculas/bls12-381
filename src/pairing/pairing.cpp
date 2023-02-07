@@ -87,9 +87,8 @@ struct HelperPairing : pairing::MillerLoopDriver<field::Fp12> {
     group::G2Affine base;
     group::G1Affine p;
 
-    HelperPairing(const group::G2Projective &current,
-                  const group::G2Affine &base, const group::G1Affine &p)
-            : current{current}, base{base}, p{p} {}
+    HelperPairing(group::G2Projective current, group::G2Affine base, group::G1Affine p)
+            : current{std::move(current)}, base{std::move(base)}, p{std::move(p)} {}
 
     field::Fp12 doubling_step(field::Fp12 &f) override {
         auto coeffs = pairing::doubling_step(this->current);

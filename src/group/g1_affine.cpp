@@ -8,31 +8,35 @@ namespace bls12_381::group {
 
 G1Affine::G1Affine() : x{field::Fp::zero()}, y{field::Fp::one()}, infinity{true} {}
 
-G1Affine::G1Affine(G1Projective &&point) : x{field::Fp::zero()}, y{field::Fp::one()}, infinity{true} {
-    field::Fp z_inv = point.get_z().invert().value_or(field::Fp::zero());
-    field::Fp rx = point.get_x() * z_inv;
-    field::Fp ry = point.get_y() * z_inv;
-    G1Affine temp{rx, ry, false};
-    if (!z_inv.is_zero()) *this = temp;
-}
-
-G1Affine::G1Affine(field::Fp &&x, field::Fp &&y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
-
-G1Affine::G1Affine(const G1Projective &point) : x{field::Fp::zero()}, y{field::Fp::one()}, infinity{true} {
-    field::Fp z_inv = point.get_z().invert().value_or(field::Fp::zero());
-    field::Fp rx = point.get_x() * z_inv;
-    field::Fp ry = point.get_y() * z_inv;
-    G1Affine temp{rx, ry, false};
-    if (!z_inv.is_zero()) *this = temp;
-}
+G1Affine::G1Affine(const G1Affine &point) = default;
 
 G1Affine::G1Affine(const field::Fp &x, const field::Fp &y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
 
-G1Affine G1Affine::identity() {
+G1Affine::G1Affine(const G1Projective &point) : x{field::Fp::zero()}, y{field::Fp::one()}, infinity{true} {
+    const field::Fp z_inv = point.get_z().invert().value_or(field::Fp::zero());
+    const field::Fp rx = point.get_x() * z_inv;
+    const field::Fp ry = point.get_y() * z_inv;
+    G1Affine temp{rx, ry, false};
+    if (!z_inv.is_zero()) *this = temp;
+}
+
+G1Affine::G1Affine(G1Affine &&point) noexcept = default;
+
+G1Affine::G1Affine(G1Projective &&point) : x{field::Fp::zero()}, y{field::Fp::one()}, infinity{true} {
+    const field::Fp z_inv = point.get_z().invert().value_or(field::Fp::zero());
+    const field::Fp rx = point.get_x() * z_inv;
+    const field::Fp ry = point.get_y() * z_inv;
+    G1Affine temp{rx, ry, false};
+    if (!z_inv.is_zero()) *this = temp;
+}
+
+G1Affine::G1Affine(field::Fp &&x, field::Fp &&y, bool infinity) : x{std::move(x)}, y{std::move(y)}, infinity{infinity} {}
+
+G1Affine G1Affine::identity() noexcept {
     return G1Affine{};
 }
 
-G1Affine G1Affine::generator() {
+G1Affine G1Affine::generator() noexcept {
     return G1Affine{
             field::Fp({
                               0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
@@ -48,28 +52,26 @@ G1Affine G1Affine::generator() {
 
 std::optional<G1Affine>
 G1Affine::from_compressed(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes) {
-    std::optional<G1Affine> res = G1Affine::from_compressed_unchecked(bytes);
+    const std::optional<G1Affine> res = G1Affine::from_compressed_unchecked(bytes);
     if (!res.has_value()) return std::nullopt;
     if (!res.value().is_torsion_free()) return std::nullopt;
     return res.value();
 }
 
 std::optional<G1Affine> G1Affine::from_compressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes) {
-    bool compression_flag_set = (bytes[0] >> 7) & 1;
-    bool infinity_flat_set = (bytes[0] >> 6) & 1;
-    bool sort_flat_set = (bytes[0] >> 5) & 1;
+    const bool compression_flag_set = (bytes[0] >> 7) & 1;
+    const bool infinity_flat_set = (bytes[0] >> 6) & 1;
+    const bool sort_flat_set = (bytes[0] >> 5) & 1;
 
     // try to decode the x-coordinate
-    std::array<uint8_t, G1Affine::BYTE_SIZE> temp{0};
-    for (int i = 0; i < temp.size(); ++i)
-        temp[i] = bytes[i];
+    std::array<uint8_t, G1Affine::BYTE_SIZE> temp{bytes};
     temp[0] &= 0b00011111;
     std::optional<field::Fp> sx = field::Fp::from_bytes(temp);
 
     if (!sx.has_value()) return std::nullopt;
     if (infinity_flat_set & compression_flag_set & (!sort_flat_set) & sx.value().is_zero()) return G1Affine::identity();
 
-    field::Fp x_cord = sx.value();
+    const field::Fp x_cord = sx.value();
 
     std::optional<field::Fp> sy = (x_cord.square() * x_cord + field::constant::B).sqrt();
     if (!sy.has_value()) return std::nullopt;
@@ -82,7 +84,7 @@ std::optional<G1Affine> G1Affine::from_compressed_unchecked(const std::array<uin
 }
 
 std::optional<G1Affine> G1Affine::from_uncompressed(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes) {
-    std::optional<G1Affine> res = G1Affine::from_uncompressed_unchecked(bytes);
+    const std::optional<G1Affine> res = G1Affine::from_uncompressed_unchecked(bytes);
     if (!res.has_value()) return std::nullopt;
     if (!res.value().is_on_curve() || !res.value().is_torsion_free()) return std::nullopt;
     return res.value();
@@ -90,21 +92,19 @@ std::optional<G1Affine> G1Affine::from_uncompressed(const std::array<uint8_t, G1
 
 std::optional<G1Affine>
 G1Affine::from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes) {
-    bool compression_flag_set = (bytes[0] >> 7) & 1;
-    bool infinity_flat_set = (bytes[0] >> 6) & 1;
-    bool sort_flat_set = (bytes[0] >> 5) & 1;
+    const bool compression_flag_set = (bytes[0] >> 7) & 1;
+    const bool infinity_flat_set = (bytes[0] >> 6) & 1;
+    const bool sort_flat_set = (bytes[0] >> 5) & 1;
 
     // try to decode the x-coordinate
     std::array<uint8_t, G1Affine::BYTE_SIZE> temp{0};
-    for (int i = 0; i < temp.size(); ++i)
-        temp[i] = bytes[i];
+    std::copy(bytes.begin(), bytes.begin() + G1Affine::BYTE_SIZE, temp.begin());
     temp[0] &= 0b00011111;
-    std::optional<field::Fp> sx = field::Fp::from_bytes(temp);
+    const std::optional<field::Fp> sx = field::Fp::from_bytes(temp);
 
     // try to decode the y-coordinate
-    for (int i = 0; i < temp.size(); ++i)
-        temp[i] = bytes[i + G1Affine::BYTE_SIZE];
-    std::optional<field::Fp> sy = field::Fp::from_bytes(temp);
+    std::copy(bytes.begin() + G1Affine::BYTE_SIZE, bytes.end(), temp.begin());
+    const std::optional<field::Fp> sy = field::Fp::from_bytes(temp);
 
     if (!sx.has_value() || !sy.has_value()) return std::nullopt;
     if (compression_flag_set || sort_flat_set) return std::nullopt;
@@ -122,11 +122,11 @@ G1Affine::from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_S
     }
 }
 
-field::Fp G1Affine::get_x() const {
+field::Fp G1Affine::get_x() const noexcept {
     return this->x;
 }
 
-field::Fp G1Affine::get_y() const {
+field::Fp G1Affine::get_y() const noexcept {
     return this->y;
 }
 
@@ -139,8 +139,8 @@ bool G1Affine::is_on_curve() const {
 }
 
 bool G1Affine::is_torsion_free() const {
-    G1Projective minus_x_squared_times_p = -G1Projective(*this).mul_by_x().mul_by_x();
-    G1Affine endomorphism_p = this->endomorphism();
+    const G1Projective minus_x_squared_times_p = -G1Projective(*this).mul_by_x().mul_by_x();
+    const G1Affine endomorphism_p = this->endomorphism();
     return minus_x_squared_times_p == G1Projective(endomorphism_p);
 }
 
@@ -156,8 +156,8 @@ std::array<uint8_t, G1Affine::BYTE_SIZE> G1Affine::to_compressed() const {
 
 std::array<uint8_t, G1Affine::BYTE_SIZE * 2> G1Affine::to_uncompressed() const {
     std::array<uint8_t, G1Affine::BYTE_SIZE * 2> bytes{};
-    std::array<uint8_t, G1Affine::BYTE_SIZE> x_bytes = (this->infinity ? field::Fp::zero() : this->x).to_bytes();
-    std::array<uint8_t, G1Affine::BYTE_SIZE> y_bytes = (this->infinity ? field::Fp::zero() : this->y).to_bytes();
+    const std::array<uint8_t, G1Affine::BYTE_SIZE> x_bytes = (this->infinity ? field::Fp::zero() : this->x).to_bytes();
+    const std::array<uint8_t, G1Affine::BYTE_SIZE> y_bytes = (this->infinity ? field::Fp::zero() : this->y).to_bytes();
 
     std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin());
     std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + G1Affine::BYTE_SIZE);
@@ -174,6 +174,14 @@ G1Affine G1Affine::endomorphism() const {
 }
 
 G1Affine &G1Affine::operator=(const G1Affine &rhs) {
+    if (this == &rhs) return *this;
+    this->x = rhs.x;
+    this->y = rhs.y;
+    this->infinity = rhs.infinity;
+    return *this;
+}
+
+G1Affine &G1Affine::operator=(G1Affine &&rhs) noexcept {
     if (this == &rhs) return *this;
     this->x = rhs.x;
     this->y = rhs.y;

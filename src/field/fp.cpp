@@ -14,13 +14,13 @@ Fp::Fp() : data{0} {}
 
 Fp::Fp(const Fp &fp) = default;
 
-Fp::Fp(Fp &&fp) noexcept = default;
-
 Fp::Fp(uint64_t val) : data{val} {}
 
-Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) : data{data} {}
-
 Fp::Fp(const std::array<uint64_t, Fp::WIDTH> &data) : data{data} {}
+
+Fp::Fp(Fp &&fp) noexcept = default;
+
+Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) : data{data} {}
 
 Fp Fp::zero() noexcept {
     return Fp{};
@@ -30,7 +30,7 @@ Fp Fp::one() noexcept {
     return constant::R1;
 }
 
-Fp Fp::random() noexcept {
+Fp Fp::random() {
     std::array<uint64_t, Fp::WIDTH * 2> randoms{};
     for (uint64_t &random: randoms) random = bls12_381::util::random::getRandom<uint64_t>();
     return Fp::reduce(randoms);
@@ -151,7 +151,7 @@ bool Fp::lexicographically_largest() const {
 std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     std::array<uint64_t, Fp::WIDTH * 2> contents{0};
     for (int i = 0; i < Fp::WIDTH; ++i)
-            contents[i] = this->data[i];
+        contents[i] = this->data[i];
 
     // turn this into canonical form by computing (a.R) / R = a.
     const Fp point = Fp::montgomery_reduce(contents);
@@ -167,11 +167,11 @@ std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     return bytes;
 }
 
-std::string Fp::getHex() const {
+std::string Fp::to_hex_str() const {
     std::array<uint8_t, Fp::BYTE_SIZE> bytes = this->to_bytes();
 
     std::string res = "0x";
-    res += bls12_381::util::encoding::hexStr(bytes);
+    res += bls12_381::util::encoding::hex_str(bytes);
     return res;
 }
 

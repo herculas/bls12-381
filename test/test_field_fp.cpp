@@ -131,7 +131,7 @@ TEST(TestFp, Str) {
                                    0xcdb21f93078dbb3e, 0xc32365c5e73f474a, 0x115a2a5489babe5b,
                            });
     EXPECT_TRUE(
-            a.getHex() ==
+            a.to_hex_str() ==
             "0x104bf052ad3bc99bcb176c24a06a6c3aad4eaf2308fc4d282e106c84a757d061052630515305e59bdddf8111bfdeb704"
     );
 }

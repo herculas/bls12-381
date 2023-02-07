@@ -12,14 +12,14 @@ private:
 
 public:
     Fp12();
-    Fp12(const Fp12 &fp);
-    Fp12(Fp12 &&fp) noexcept;
 
+    Fp12(const Fp12 &fp);
     explicit Fp12(const Fp &fp);
     explicit Fp12(const Fp2 &fp);
     explicit Fp12(const Fp6 &fp);
     explicit Fp12(const Fp6 &fp0, const Fp6 &fp1);
 
+    Fp12(Fp12 &&fp) noexcept;
     explicit Fp12(Fp &&fp);
     explicit Fp12(Fp2 &&fp);
     explicit Fp12(Fp6 &&fp);
@@ -27,7 +27,7 @@ public:
 
     static Fp12 zero() noexcept;
     static Fp12 one() noexcept;
-    static Fp12 random() noexcept;
+    static Fp12 random();
 
     [[nodiscard]] Fp6 get_c0() const noexcept;
     [[nodiscard]] Fp6 get_c1() const noexcept;

@@ -8,11 +8,11 @@ Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
 
 Fp2::Fp2(const Fp2 &fp) = default;
 
-Fp2::Fp2(Fp2 &&fp) noexcept = default;
-
 Fp2::Fp2(const Fp &fp) : c0{fp}, c1{Fp::zero()} {}
 
 Fp2::Fp2(const Fp &fp0, const Fp &fp1) : c0{fp0}, c1{fp1} {}
+
+Fp2::Fp2(Fp2 &&fp) noexcept = default;
 
 Fp2::Fp2(Fp &&fp) : c0{std::move(fp)}, c1{Fp::zero()} {}
 
@@ -32,7 +32,7 @@ Fp2 Fp2::one() noexcept {
     };
 }
 
-Fp2 Fp2::random() noexcept {
+Fp2 Fp2::random() {
     return Fp2{
             Fp::random(),
             Fp::random()
@@ -55,8 +55,8 @@ bool Fp2::lexicographically_largest() const {
     return this->c1.lexicographically_largest() | (this->c1.is_zero() & this->c0.lexicographically_largest());
 }
 
-std::string Fp2::getHex() const {
-    return this->c0.getHex() + " + " + this->c1.getHex() + " * u";
+std::string Fp2::to_hex_str() const {
+    return this->c0.to_hex_str() + " + " + this->c1.to_hex_str() + " * u";
 }
 
 Fp2 Fp2::square() const {

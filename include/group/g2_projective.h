@@ -17,21 +17,23 @@ private:
 public:
     G2Projective();
 
-    explicit G2Projective(G2Affine &&point);
-    explicit G2Projective(field::Fp2 &&x, field::Fp2 &&y, field::Fp2 &&z);
-
+    G2Projective(const G2Projective &point);
     explicit G2Projective(const G2Affine &point);
     explicit G2Projective(const field::Fp2 &x, const field::Fp2 &y, const field::Fp2 &z);
 
-    static G2Projective identity();
-    static G2Projective generator();
+    G2Projective(G2Projective &&point) noexcept;
+    explicit G2Projective(G2Affine &&point);
+    explicit G2Projective(field::Fp2 &&x, field::Fp2 &&y, field::Fp2 &&z);
+
+    static G2Projective identity() noexcept;
+    static G2Projective generator() noexcept;
     static G2Projective random();
 
     static std::vector<G2Affine> batch_normalize(const std::vector<G2Projective> &points);
 
-    [[nodiscard]] field::Fp2 get_x() const;
-    [[nodiscard]] field::Fp2 get_y() const;
-    [[nodiscard]] field::Fp2 get_z() const;
+    [[nodiscard]] field::Fp2 get_x() const noexcept;
+    [[nodiscard]] field::Fp2 get_y() const noexcept;
+    [[nodiscard]] field::Fp2 get_z() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
@@ -50,6 +52,7 @@ private:
 public:
     G2Projective operator-() const;
     G2Projective &operator=(const G2Projective &rhs);
+    G2Projective &operator=(G2Projective &&rhs) noexcept;
 
     G2Projective &operator+=(const G2Projective &rhs);
     G2Projective &operator-=(const G2Projective &rhs);

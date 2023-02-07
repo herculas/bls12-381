@@ -23,12 +23,15 @@ private:
 public:
     Scalar();
 
+    Scalar(const Scalar &scalar);
     explicit Scalar(uint64_t val);
-    explicit Scalar(std::array<uint64_t, Scalar::WIDTH> &&data);
     explicit Scalar(const std::array<uint64_t, Scalar::WIDTH> &data);
 
-    static Scalar zero();
-    static Scalar one();
+    Scalar(Scalar &&scalar) noexcept;
+    explicit Scalar(std::array<uint64_t, Scalar::WIDTH> &&data);
+
+    static Scalar zero() noexcept;
+    static Scalar one() noexcept;
     static Scalar random();
 
     static Scalar montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &rs);
@@ -55,6 +58,7 @@ private:
 public:
     Scalar operator-() const;
     Scalar &operator=(const Scalar &rhs);
+    Scalar &operator=(Scalar &&rhs) noexcept;
 
     Scalar &operator+=(const Scalar &rhs);
     Scalar &operator-=(const Scalar &rhs);

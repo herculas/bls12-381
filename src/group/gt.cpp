@@ -6,15 +6,19 @@ namespace bls12_381::group {
 
 Gt::Gt() : data{field::Fp12::one()} {}
 
+Gt::Gt(const Gt &point) = default;
+
 Gt::Gt(const field::Fp12 &point) : data{point} {}
 
-Gt::Gt(field::Fp12 &&point) : data{point} {}
+Gt::Gt(Gt &&point) noexcept = default;
 
-Gt Gt::identity() {
+Gt::Gt(field::Fp12 &&point) : data{std::move(point)} {}
+
+Gt Gt::identity() noexcept {
     return Gt{};
 }
 
-Gt Gt::generator() {
+Gt Gt::generator() noexcept {
     return Gt{
             field::Fp12{
                     field::Fp6{
@@ -106,6 +110,12 @@ Gt Gt::operator-() const {
 }
 
 Gt &Gt::operator=(const Gt &rhs) {
+    if (*this == rhs) return *this;
+    this->data = rhs.data;
+    return *this;
+}
+
+Gt &Gt::operator=(Gt &&rhs) noexcept {
     if (*this == rhs) return *this;
     this->data = rhs.data;
     return *this;

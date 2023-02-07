@@ -19,16 +19,17 @@ private:
 
 public:
     Fp();
-    Fp(const Fp &fp);
-    Fp(Fp &&fp) noexcept;
 
+    Fp(const Fp &fp);
     explicit Fp(uint64_t val);
-    explicit Fp(std::array<uint64_t, Fp::WIDTH> &&data);
     explicit Fp(const std::array<uint64_t, Fp::WIDTH> &data);
+
+    Fp(Fp &&fp) noexcept;
+    explicit Fp(std::array<uint64_t, Fp::WIDTH> &&data);
 
     static Fp zero() noexcept;
     static Fp one() noexcept;
-    static Fp random() noexcept;
+    static Fp random();
 
     static Fp montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts);
     static Fp sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b);
@@ -37,7 +38,7 @@ public:
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;
 
-    [[nodiscard]] std::string getHex() const;
+    [[nodiscard]] std::string to_hex_str() const;
     [[nodiscard]] std::array<uint8_t, Fp::BYTE_SIZE> to_bytes() const;
 
     [[nodiscard]] Fp square() const;

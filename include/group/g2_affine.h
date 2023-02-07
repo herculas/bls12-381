@@ -21,22 +21,25 @@ private:
 
 public:
     G2Affine();
-    explicit G2Affine(G2Projective &&point);
-    explicit G2Affine(field::Fp2 &&x, field::Fp2 &&y, bool infinity);
 
+    G2Affine(const G2Affine &point);
     explicit G2Affine(const G2Projective &point);
     explicit G2Affine(const field::Fp2 &x, const field::Fp2 &y, bool infinity);
 
-    static G2Affine identity();
-    static G2Affine generator();
+    G2Affine(G2Affine &&point) noexcept;
+    explicit G2Affine(G2Projective &&point);
+    explicit G2Affine(field::Fp2 &&x, field::Fp2 &&y, bool infinity);
+
+    static G2Affine identity() noexcept;
+    static G2Affine generator() noexcept;
 
     static std::optional<G2Affine> from_compressed(const std::array<uint8_t, G2Affine::BYTE_SIZE> &bytes);
     static std::optional<G2Affine> from_compressed_unchecked(const std::array<uint8_t, G2Affine::BYTE_SIZE> &bytes);
     static std::optional<G2Affine> from_uncompressed(const std::array<uint8_t, G2Affine::BYTE_SIZE * 2> &bytes);
     static std::optional<G2Affine> from_uncompressed_unchecked(const std::array<uint8_t, G2Affine::BYTE_SIZE * 2> &bytes);
 
-    [[nodiscard]] field::Fp2 get_x() const;
-    [[nodiscard]] field::Fp2 get_y() const;
+    [[nodiscard]] field::Fp2 get_x() const noexcept;
+    [[nodiscard]] field::Fp2 get_y() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
@@ -48,6 +51,7 @@ public:
 public:
     G2Affine operator-() const;
     G2Affine &operator=(const G2Affine &rhs);
+    G2Affine &operator=(G2Affine &&rhs) noexcept;
 
 public:
     friend G2Projective operator+(const G2Affine &a, const G2Projective &b);

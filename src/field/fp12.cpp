@@ -6,6 +6,14 @@ Fp12::Fp12() : c0{Fp6::zero()}, c1{Fp6::zero()} {}
 
 Fp12::Fp12(const Fp12 &fp) = default;
 
+Fp12::Fp12(const Fp &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+
+Fp12::Fp12(const Fp2 &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
+
+Fp12::Fp12(const Fp6 &fp) : c0{fp}, c1{Fp6::zero()} {}
+
+Fp12::Fp12(const Fp6 &fp0, const Fp6 &fp1) : c0{fp0}, c1{fp1} {}
+
 Fp12::Fp12(Fp12 &&fp) noexcept = default;
 
 Fp12::Fp12(Fp &&fp) : c0{Fp6{fp}}, c1{Fp6::zero()} {}
@@ -15,14 +23,6 @@ Fp12::Fp12(Fp2 &&fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
 Fp12::Fp12(Fp6 &&fp) : c0{std::move(fp)}, c1{Fp6::zero()} {}
 
 Fp12::Fp12(Fp6 &&fp0, Fp6 &&fp1) : c0{std::move(fp0)}, c1{std::move(fp1)} {}
-
-Fp12::Fp12(const Fp &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
-
-Fp12::Fp12(const Fp2 &fp) : c0{Fp6(fp)}, c1{Fp6::zero()} {}
-
-Fp12::Fp12(const Fp6 &fp) : c0{fp}, c1{Fp6::zero()} {}
-
-Fp12::Fp12(const Fp6 &fp0, const Fp6 &fp1) : c0{fp0}, c1{fp1} {}
 
 Fp12 Fp12::zero() noexcept {
     return Fp12{
@@ -38,7 +38,7 @@ Fp12 Fp12::one() noexcept {
     };
 }
 
-Fp12 Fp12::random() noexcept {
+Fp12 Fp12::random() {
     return Fp12{
             Fp6::random(),
             Fp6::random(),

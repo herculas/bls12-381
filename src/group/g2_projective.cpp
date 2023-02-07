@@ -12,26 +12,27 @@ namespace bls12_381::group {
 
 G2Projective::G2Projective() : x{field::Fp2::zero()}, y{field::Fp2::one()}, z{field::Fp2::zero()} {}
 
-G2Projective::G2Projective(bls12_381::group::G2Affine &&point) : x{point.get_x()}, y{point.get_y()},
-                                                                 z{point.is_identity() ? field::Fp2::zero()
-                                                                                       : field::Fp2::one()} {}
+G2Projective::G2Projective(const G2Projective &point) = default;
 
-G2Projective::G2Projective(bls12_381::field::Fp2 &&x, bls12_381::field::Fp2 &&y, bls12_381::field::Fp2 &&z) : x{x},
-                                                                                                              y{y},
-                                                                                                              z{z} {}
-
-G2Projective::G2Projective(const bls12_381::group::G2Affine &point) : x{point.get_x()}, y{point.get_y()},
-                                                                      z{point.is_identity() ? field::Fp2::zero()
-                                                                                            : field::Fp2::one()} {}
+G2Projective::G2Projective(const bls12_381::group::G2Affine &point)
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp2::zero() : field::Fp2::one()} {}
 
 G2Projective::G2Projective(const bls12_381::field::Fp2 &x, const bls12_381::field::Fp2 &y,
                            const bls12_381::field::Fp2 &z) : x{x}, y{y}, z{z} {}
 
-G2Projective bls12_381::group::G2Projective::identity() {
+G2Projective::G2Projective(G2Projective &&point) noexcept = default;
+
+G2Projective::G2Projective(bls12_381::group::G2Affine &&point)
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp2::zero() : field::Fp2::one()} {}
+
+G2Projective::G2Projective(bls12_381::field::Fp2 &&x, bls12_381::field::Fp2 &&y, bls12_381::field::Fp2 &&z)
+        : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
+
+G2Projective bls12_381::group::G2Projective::identity() noexcept {
     return G2Projective{};
 }
 
-G2Projective bls12_381::group::G2Projective::generator() {
+G2Projective bls12_381::group::G2Projective::generator() noexcept {
     return G2Projective{
             field::Fp2{
                     field::Fp({
@@ -59,13 +60,13 @@ G2Projective bls12_381::group::G2Projective::generator() {
 
 G2Projective bls12_381::group::G2Projective::random() {
     while (true) {
-        bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
-        field::Fp2 rx = field::Fp2::random();
-        auto temp = (rx.square() * rx + field::constant::B2).sqrt();
+        const bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
+        const field::Fp2 rx = field::Fp2::random();
+        const auto temp = (rx.square() * rx + field::constant::B2).sqrt();
         if (!temp.has_value()) continue;
-        field::Fp2 ry = temp.value();
-        G2Affine point{rx, flip_sign ? -ry : ry, false};
-        G2Projective curve(point);
+        const field::Fp2 &ry = temp.value();
+        const G2Affine point{rx, flip_sign ? -ry : ry, false};
+        const G2Projective curve(point);
         G2Projective res = curve.clear_cofactor();
         if (!res.is_identity()) return res;
     }
@@ -94,15 +95,15 @@ std::vector<G2Affine> G2Projective::batch_normalize(const std::vector<G2Projecti
     return results;
 }
 
-field::Fp2 G2Projective::get_x() const {
+field::Fp2 G2Projective::get_x() const noexcept {
     return this->x;
 }
 
-field::Fp2 G2Projective::get_y() const {
+field::Fp2 G2Projective::get_y() const noexcept {
     return this->y;
 }
 
-field::Fp2 G2Projective::get_z() const {
+field::Fp2 G2Projective::get_z() const noexcept {
     return this->z;
 }
 
@@ -304,6 +305,14 @@ G2Projective G2Projective::operator-() const {
 }
 
 G2Projective &G2Projective::operator=(const G2Projective &rhs) {
+    if (this == &rhs) return *this;
+    this->x = rhs.x;
+    this->y = rhs.y;
+    this->z = rhs.z;
+    return *this;
+}
+
+G2Projective &G2Projective::operator=(G2Projective &&rhs) noexcept {
     if (this == &rhs) return *this;
     this->x = rhs.x;
     this->y = rhs.y;

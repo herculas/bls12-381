@@ -18,9 +18,9 @@ struct Helper : pairing::MillerLoopDriver<void> {
     G2Affine base;
     std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coefficients;
 
-    Helper(const G2Projective &current, const G2Affine &base,
+    Helper(G2Projective current, G2Affine base,
            const std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> &coefficients)
-            : current{current}, base{base}, coefficients{coefficients} {}
+            : current{std::move(current)}, base{std::move(base)}, coefficients{coefficients} {}
 
     void doubling_step() override {
         auto coeffs = pairing::doubling_step(this->current);
