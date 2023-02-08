@@ -328,17 +328,9 @@ Scalar Scalar::reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &limbs) {
     return d0 * constant::R2 + d1 * constant::R3;
 }
 
-Scalar &Scalar::operator=(const Scalar &rhs) {
-    if (this == &rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Scalar &Scalar::operator=(const Scalar &rhs) = default;
 
-Scalar &Scalar::operator=(Scalar &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Scalar &Scalar::operator=(Scalar &&rhs) noexcept = default;
 
 Scalar &Scalar::operator+=(const Scalar &rhs) {
     uint64_t carry = 0;

@@ -109,17 +109,9 @@ Gt Gt::operator-() const {
     return Gt{this->data.conjugate()};
 }
 
-Gt &Gt::operator=(const Gt &rhs) {
-    if (*this == rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Gt &Gt::operator=(const Gt &rhs) = default;
 
-Gt &Gt::operator=(Gt &&rhs) noexcept {
-    if (*this == rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Gt &Gt::operator=(Gt &&rhs) noexcept = default;
 
 Gt &Gt::operator+=(const Gt &rhs) {
     *this = Gt{this->data * rhs.data};

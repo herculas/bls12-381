@@ -18,6 +18,7 @@ struct MillerLoopDriver {
     virtual T square_output(T &f) = 0;
     virtual T conjugate(T &f) = 0;
     virtual T one() = 0;
+    virtual ~MillerLoopDriver() = default;
 };
 
 template<>
@@ -27,6 +28,7 @@ struct MillerLoopDriver<void> {
     virtual void square_output() = 0;
     virtual void conjugate() = 0;
     virtual void one() = 0;
+    virtual ~MillerLoopDriver() = default;
 };
 
 std::tuple<field::Fp2, field::Fp2, field::Fp2> doubling_step(group::G2Projective &point);

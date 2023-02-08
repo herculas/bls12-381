@@ -173,21 +173,9 @@ G1Affine G1Affine::endomorphism() const {
     return res;
 }
 
-G1Affine &G1Affine::operator=(const G1Affine &rhs) {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->infinity = rhs.infinity;
-    return *this;
-}
+G1Affine &G1Affine::operator=(const G1Affine &rhs) = default;
 
-G1Affine &G1Affine::operator=(G1Affine &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->infinity = rhs.infinity;
-    return *this;
-}
+G1Affine &G1Affine::operator=(G1Affine &&rhs) noexcept = default;
 
 G1Affine G1Affine::operator-() const {
     return G1Affine{

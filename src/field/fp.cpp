@@ -277,17 +277,9 @@ Fp Fp::reduce(const std::array<uint64_t, Fp::WIDTH * 2> &limbs) {
     return d0 * constant::R2 + d1 * constant::R3;
 }
 
-Fp &Fp::operator=(const Fp &rhs) {
-    if (this == &rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Fp &Fp::operator=(const Fp &rhs) = default;
 
-Fp &Fp::operator=(Fp &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->data = rhs.data;
-    return *this;
-}
+Fp &Fp::operator=(Fp &&rhs) noexcept = default;
 
 Fp &Fp::operator+=(const Fp &rhs) {
     uint64_t carry = 0;

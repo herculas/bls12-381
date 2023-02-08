@@ -248,21 +248,9 @@ G1Projective G1Projective::operator-() const {
     };
 }
 
-G1Projective &G1Projective::operator=(const G1Projective &rhs) {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->z = rhs.z;
-    return *this;
-}
+G1Projective &G1Projective::operator=(const G1Projective &rhs) = default;
 
-G1Projective &G1Projective::operator=(G1Projective &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->z = rhs.z;
-    return *this;
-}
+G1Projective &G1Projective::operator=(G1Projective &&rhs) noexcept = default;
 
 G1Projective &G1Projective::operator+=(const G1Projective &rhs) {
     *this = this->add(rhs);

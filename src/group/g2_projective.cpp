@@ -304,21 +304,9 @@ G2Projective G2Projective::operator-() const {
     };
 }
 
-G2Projective &G2Projective::operator=(const G2Projective &rhs) {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->z = rhs.z;
-    return *this;
-}
+G2Projective &G2Projective::operator=(const G2Projective &rhs) = default;
 
-G2Projective &G2Projective::operator=(G2Projective &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->z = rhs.z;
-    return *this;
-}
+G2Projective &G2Projective::operator=(G2Projective &&rhs) noexcept = default;
 
 G2Projective &G2Projective::operator+=(const G2Projective &rhs) {
     *this = this->add(rhs);

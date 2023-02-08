@@ -154,19 +154,9 @@ std::optional<Fp2> Fp2::invert() const {
     }
 }
 
-Fp2 &Fp2::operator=(const Fp2 &rhs) {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    return *this;
-}
+Fp2 &Fp2::operator=(const Fp2 &rhs) = default;
 
-Fp2 &Fp2::operator=(Fp2 &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    return *this;
-}
+Fp2 &Fp2::operator=(Fp2 &&rhs) noexcept = default;
 
 Fp2 &Fp2::operator+=(const Fp2 &rhs) {
     *this = Fp2{

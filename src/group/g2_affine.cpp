@@ -208,21 +208,9 @@ G2Affine G2Affine::operator-() const {
     };
 }
 
-G2Affine &G2Affine::operator=(const G2Affine &rhs) {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->infinity = rhs.infinity;
-    return *this;
-}
+G2Affine &G2Affine::operator=(const G2Affine &rhs) = default;
 
-G2Affine &G2Affine::operator=(G2Affine &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->infinity = rhs.infinity;
-    return *this;
-}
+G2Affine &G2Affine::operator=(G2Affine &&rhs) noexcept = default;
 
 G2Projective operator+(const G2Affine &a, const G2Projective &b) {
     return G2Projective(b) += a;

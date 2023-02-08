@@ -112,19 +112,9 @@ std::optional<Fp12> Fp12::invert() const {
     };
 }
 
-Fp12 &Fp12::operator=(const Fp12 &rhs) {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    return *this;
-}
+Fp12 &Fp12::operator=(const Fp12 &rhs) = default;
 
-Fp12 &Fp12::operator=(Fp12 &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    return *this;
-}
+Fp12 &Fp12::operator=(Fp12 &&rhs) noexcept = default;
 
 Fp12 &Fp12::operator+=(const Fp12 &rhs) {
     *this = Fp12{

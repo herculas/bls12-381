@@ -179,21 +179,9 @@ std::optional<Fp6> Fp6::invert() const {
     };
 }
 
-Fp6 &Fp6::operator=(const Fp6 &rhs) {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    this->c2 = rhs.c2;
-    return *this;
-}
+Fp6 &Fp6::operator=(const Fp6 &rhs) = default;
 
-Fp6 &Fp6::operator=(Fp6 &&rhs) noexcept {
-    if (this == &rhs) return *this;
-    this->c0 = rhs.c0;
-    this->c1 = rhs.c1;
-    this->c2 = rhs.c2;
-    return *this;
-}
+Fp6 &Fp6::operator=(Fp6 &&rhs) noexcept = default;
 
 Fp6 &Fp6::operator+=(const Fp6 &rhs) {
     *this = Fp6{
