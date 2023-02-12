@@ -43,7 +43,7 @@ public:
 
     [[nodiscard]] Fp square() const;
     [[nodiscard]] Fp subtract_modulus() const;
-    [[nodiscard]] Fp pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const;
+    [[nodiscard]] Fp pow(const std::array<uint64_t, Fp::WIDTH> &exp) const;
 
     [[nodiscard]] std::optional<Fp> sqrt() const;
     [[nodiscard]] std::optional<Fp> invert() const;

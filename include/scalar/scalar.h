@@ -41,13 +41,13 @@ public:
     static std::optional<Scalar> from_bytes(const std::array<uint8_t, Scalar::BYTE_SIZE> &bytes);
 
     [[nodiscard]] bool is_zero() const;
-    [[nodiscard]] std::string getHex() const;
+    [[nodiscard]] std::string get_hex() const;
     [[nodiscard]] std::array<uint8_t, Scalar::BYTE_SIZE> to_bytes() const;
 
     [[nodiscard]] Scalar doubles() const;
     [[nodiscard]] Scalar square() const;
     [[nodiscard]] Scalar subtract_modulus() const;
-    [[nodiscard]] Scalar pow_vartime(const std::array<uint64_t, Scalar::WIDTH> &exp) const;
+    [[nodiscard]] Scalar pow(const std::array<uint64_t, Scalar::WIDTH> &exp) const;
 
     [[nodiscard]] std::optional<Scalar> sqrt() const;
     [[nodiscard]] std::optional<Scalar> invert() const;

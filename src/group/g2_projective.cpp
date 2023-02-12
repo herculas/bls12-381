@@ -60,7 +60,7 @@ G2Projective bls12_381::group::G2Projective::generator() noexcept {
 
 G2Projective bls12_381::group::G2Projective::random() {
     while (true) {
-        const bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
+        const bool flip_sign = bls12_381::util::random::get_random<uint8_t>() % 2 != 0;
         const field::Fp2 rx = field::Fp2::random();
         const auto temp = (rx.square() * rx + field::constant::B2).sqrt();
         if (!temp.has_value()) continue;

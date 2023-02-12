@@ -20,11 +20,11 @@ TEST(TestScalar, Zero) {
 }
 
 TEST(TestScalar, HexStr) {
-    EXPECT_TRUE(bls12_381::scalar::Scalar::zero().getHex() ==
+    EXPECT_TRUE(bls12_381::scalar::Scalar::zero().get_hex() ==
                 "0x0000000000000000000000000000000000000000000000000000000000000000");
-    EXPECT_TRUE(bls12_381::scalar::Scalar::one().getHex() ==
+    EXPECT_TRUE(bls12_381::scalar::Scalar::one().get_hex() ==
                 "0x0000000000000000000000000000000000000000000000000000000000000001");
-    EXPECT_TRUE(bls12_381::scalar::constant::R2.getHex() ==
+    EXPECT_TRUE(bls12_381::scalar::constant::R2.get_hex() ==
                 "0x1824b159acc5056f998c4fefecbc4ff55884b7fa0003480200000001fffffffe");
 }
 
@@ -287,7 +287,7 @@ TEST(TestScalar, InvertIsPow) {
 
     for (int i = 0; i < 100; ++i) {
         r1 = r1.invert().value();
-        r2 = r2.pow_vartime(q_minus_2);
+        r2 = r2.pow(q_minus_2);
 
         EXPECT_EQ(r1, r2);
 

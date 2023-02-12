@@ -32,7 +32,7 @@ Scalar Scalar::one() noexcept {
 
 Scalar Scalar::random() {
     std::array<uint8_t, Scalar::BYTE_SIZE * 2> bytes{};
-    for (uint8_t &byte: bytes) byte = bls12_381::util::random::getRandom<uint8_t>();
+    for (uint8_t &byte: bytes) byte = bls12_381::util::random::get_random<uint8_t>();
     return Scalar::from_bytes_wide(bytes);
 }
 
@@ -101,7 +101,7 @@ bool Scalar::is_zero() const {
            && this->data[3] == 0;
 }
 
-std::string Scalar::getHex() const {
+std::string Scalar::get_hex() const {
     std::array<uint8_t, Scalar::BYTE_SIZE> bytes = this->to_bytes();
     std::reverse(bytes.begin(), bytes.end());
 
@@ -171,7 +171,7 @@ Scalar Scalar::subtract_modulus() const {
     return *this - constant::MODULUS;
 }
 
-Scalar Scalar::pow_vartime(const std::array<uint64_t, Scalar::WIDTH> &exp) const {
+Scalar Scalar::pow(const std::array<uint64_t, Scalar::WIDTH> &exp) const {
     Scalar res = Scalar::one();
     for (int i = Scalar::WIDTH - 1; i >= 0; --i) {
         for (int j = 63; j >= 0; --j) {
@@ -187,7 +187,7 @@ std::optional<Scalar> Scalar::sqrt() const {
             0x7fff2dff7fffffff, 0x04d0ec02a9ded201,
             0x94cebea4199cec04, 0x0000000039f6d3a9,
     };
-    const Scalar w = this->pow_vartime(exp);
+    const Scalar w = this->pow(exp);
 
     uint32_t v = constant::S;
     Scalar x = *this * w;

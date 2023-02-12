@@ -32,7 +32,8 @@ Fp Fp::one() noexcept {
 
 Fp Fp::random() {
     std::array<uint64_t, Fp::WIDTH * 2> randoms{};
-    for (uint64_t &random: randoms) random = bls12_381::util::random::getRandom<uint64_t>();
+    for (uint64_t &random: randoms)
+        random = bls12_381::util::random::get_random<uint64_t>();
     return Fp::reduce(randoms);
 }
 
@@ -130,7 +131,7 @@ bool Fp::lexicographically_largest() const {
         if (i < WIDTH)
             contents[i] = this->data[i];
 
-    Fp temp = Fp::montgomery_reduce(contents);
+    const Fp temp = Fp::montgomery_reduce(contents);
 
     uint64_t subs[WIDTH] = {
             0xdcff7fffffffd556, 0x0f55ffff58a9ffff, 0xb39869507b587b12,
@@ -199,13 +200,12 @@ Fp Fp::square() const {
     temp[0] = 0;
     for (int i = 0; i < Fp::WIDTH * 2; ++i) {
         if (i % 2 == 0) {
-            std::tie(temp[i], carry) = bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2],
-                                                                        carry);
+            std::tie(temp[i], carry) =
+                    bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2], carry);
         } else {
             std::tie(temp[i], carry) = bls12_381::util::arithmetic::adc(temp[i], 0, carry);
         }
     }
-
     return Fp::montgomery_reduce(temp);
 }
 
@@ -228,7 +228,7 @@ Fp Fp::subtract_modulus() const {
     return Fp({d[0], d[1], d[2], d[3], d[4], d[5]});
 }
 
-Fp Fp::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
+Fp Fp::pow(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp res = Fp::one();
     for (int i = Fp::WIDTH - 1; i >= 0; i--) {
         for (int32_t j = 63; j >= 0; j--) {
@@ -244,7 +244,7 @@ std::optional<Fp> Fp::sqrt() const {
             0xee7fbfffffffeaab, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
             0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6,
     };
-    const Fp sqrt = this->pow_vartime(exp);
+    const Fp sqrt = this->pow(exp);
 
     if (sqrt.square() == *this) {
         return sqrt;
@@ -261,7 +261,7 @@ std::optional<Fp> Fp::invert() const {
             0xb9feffffffffaaa9, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
             0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a,
     };
-    const Fp result = this->pow_vartime(exp);
+    const Fp result = this->pow(exp);
 
     if (this->is_zero()) {
         return std::nullopt;

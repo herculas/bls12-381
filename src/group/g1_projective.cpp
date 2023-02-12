@@ -48,7 +48,7 @@ G1Projective G1Projective::generator() noexcept {
 
 G1Projective G1Projective::random() {
     while (true) {
-        const bool flip_sign = bls12_381::util::random::getRandom<uint8_t>() % 2 != 0;
+        const bool flip_sign = bls12_381::util::random::get_random<uint8_t>() % 2 != 0;
         const field::Fp rx = field::Fp::random();
         const auto temp = (rx.square() * rx + field::constant::B).sqrt();
         if (!temp.has_value()) continue;

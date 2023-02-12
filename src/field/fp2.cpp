@@ -88,7 +88,7 @@ Fp2 Fp2::mul_by_non_residue() const {
     };
 }
 
-Fp2 Fp2::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
+Fp2 Fp2::pow(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp2 res = Fp2::one();
     for (int i = Fp::WIDTH - 1; i >= 0; --i) {
         for (int j = 63; j >= 0; --j) {
@@ -101,7 +101,7 @@ Fp2 Fp2::pow_vartime(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     return res;
 }
 
-Fp2 Fp2::pow_vartime_extended(const std::vector<uint64_t> &exp) const {
+Fp2 Fp2::pow_extended(const std::vector<uint64_t> &exp) const {
     const auto len = static_cast<int32_t>(exp.size());
     Fp2 res = Fp2::one();
     for (int i = len - 1; i >= 0; --i) {
@@ -120,7 +120,7 @@ std::optional<Fp2> Fp2::sqrt() const {
             0xee7fbfffffffeaaa, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
             0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6,
     };
-    const Fp2 a1 = this->pow_vartime(exp);
+    const Fp2 a1 = this->pow(exp);
     const Fp2 alpha = a1.square() * *this;
     const Fp2 x0 = a1 * *this;
 
@@ -132,7 +132,7 @@ std::optional<Fp2> Fp2::sqrt() const {
                 0xdcff7fffffffd555, 0x0f55ffff58a9ffff, 0xb39869507b587b12,
                 0xb23ba5c279c2895f, 0x258dd3db21a5d66b, 0x0d0088f51cbff34d,
         };
-        sqrt = (alpha + Fp2::one()).pow_vartime(exp2) * x0;
+        sqrt = (alpha + Fp2::one()).pow(exp2) * x0;
     }
 
     if (sqrt.square() == *this) {
