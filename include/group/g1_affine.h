@@ -52,13 +52,15 @@ private:
 
 public:
     G1Affine operator-() const;
+
     G1Affine &operator=(const G1Affine &rhs);
     G1Affine &operator=(G1Affine &&rhs) noexcept;
-public:
-    friend G1Projective operator+(const G1Affine &a, const G1Projective &b);
-    friend G1Projective operator-(const G1Affine &a, const G1Projective &b);
-    friend G1Projective operator*(const G1Affine &a, const scalar::Scalar &b);
 
+    G1Projective operator+(const G1Projective &rhs) const;
+    G1Projective operator-(const G1Projective &rhs) const;
+    G1Projective operator*(const scalar::Scalar &rhs) const;
+
+public:
     friend inline bool operator==(const G1Affine &a, const G1Affine &b) {
         return (a.infinity & b.infinity) | ((!a.infinity) & (!b.infinity) & (a.x == b.x) & (a.y == b.y));
     }

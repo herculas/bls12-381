@@ -50,11 +50,11 @@ public:
     Fp12 &operator-=(const Fp12 &rhs);
     Fp12 &operator*=(const Fp12 &rhs);
 
-private:
-    friend inline Fp12 operator+(const Fp12 &a, const Fp12 &b) { return Fp12(a) += b; }
-    friend inline Fp12 operator-(const Fp12 &a, const Fp12 &b) { return Fp12(a) -= b; }
-    friend inline Fp12 operator*(const Fp12 &a, const Fp12 &b) { return Fp12(a) *= b; }
+    Fp12 operator+(const Fp12 &rhs) const;
+    Fp12 operator-(const Fp12 &rhs) const;
+    Fp12 operator*(const Fp12 &rhs) const;
 
+private:
     friend inline bool operator==(const Fp12 &a, const Fp12 &b) { return a.c0 == b.c0 && a.c1 == b.c1; }
     friend inline bool operator!=(const Fp12 &a, const Fp12 &b) { return a.c0 != b.c0 || a.c1 != b.c1; }
 };

@@ -277,4 +277,24 @@ G1Projective &G1Projective::operator*=(const scalar::Scalar &rhs) {
     return *this;
 }
 
+G1Projective G1Projective::operator+(const G1Projective &rhs) const {
+    return this->add(rhs);
+}
+
+G1Projective G1Projective::operator-(const G1Projective &rhs) const {
+    return this->add(-rhs);
+}
+
+G1Projective G1Projective::operator+(const G1Affine &rhs) const {
+    return this->add_mixed(rhs);
+}
+
+G1Projective G1Projective::operator-(const G1Affine &rhs) const {
+    return this->add_mixed(-rhs);
+}
+
+G1Projective G1Projective::operator*(const scalar::Scalar &rhs) const {
+    return this->multiply(rhs.to_bytes());
+}
+
 } // namespace bls12_381::group

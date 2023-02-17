@@ -51,11 +51,11 @@ public:
     Fp2 &operator-=(const Fp2 &rhs);
     Fp2 &operator*=(const Fp2 &rhs);
 
-public:
-    friend inline Fp2 operator+(const Fp2 &a, const Fp2 &b) { return Fp2(a) += b; }
-    friend inline Fp2 operator-(const Fp2 &a, const Fp2 &b) { return Fp2(a) -= b; }
-    friend inline Fp2 operator*(const Fp2 &a, const Fp2 &b) { return Fp2(a) *= b; }
+    Fp2 operator+(const Fp2 &rhs) const;
+    Fp2 operator-(const Fp2 &rhs) const;
+    Fp2 operator*(const Fp2 &rhs) const;
 
+public:
     friend inline bool operator==(const Fp2 &a, const Fp2 &b) { return a.c0 == b.c0 && a.c1 == b.c1; }
     friend inline bool operator!=(const Fp2 &a, const Fp2 &b) { return a.c0 != b.c0 || a.c1 != b.c1; }
 };

@@ -44,10 +44,12 @@ Scalar Scalar::montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &
     std::array<uint64_t, Scalar::WIDTH * 2> r = ts;
     for (int i = 0; i < Scalar::WIDTH; ++i) {
         k = r[i] * constant::INV;
-        std::tie(std::ignore, carry) = bls12_381::util::arithmetic::mac(r[i], k, constant::MODULUS.data[0], 0);
+        carry = 0;
+        bls12_381::util::arithmetic::mac(r[i], k, constant::MODULUS.data[0], carry);
         for (int j = 1; j < Scalar::WIDTH; ++j)
-            std::tie(r[i + j], carry) = bls12_381::util::arithmetic::mac(r[i + j], k, constant::MODULUS.data[j], carry);
-        std::tie(r[i + Scalar::WIDTH], carry2) = bls12_381::util::arithmetic::adc(r[i + Scalar::WIDTH], carry2, carry);
+            r[i + j] = bls12_381::util::arithmetic::mac(r[i + j], k, constant::MODULUS.data[j], carry);
+        r[i + Scalar::WIDTH] = bls12_381::util::arithmetic::adc(r[i + Scalar::WIDTH], carry2, carry);
+        carry2 = carry;
     }
     return Scalar({r[4], r[5], r[6], r[7]}).subtract_modulus();
 }
@@ -81,8 +83,7 @@ std::optional<Scalar> Scalar::from_bytes(const std::array<uint8_t, Scalar::BYTE_
 
     uint64_t borrow = 0;
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(std::ignore, borrow) =
-                bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS.data[i], borrow);
+        bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS.data[i], borrow);
 
     const uint8_t is_some = static_cast<uint8_t>(borrow) & 1;
     temp *= constant::R2;
@@ -141,12 +142,11 @@ Scalar Scalar::square() const {
         carry = 0;
         for (int j = 0; j < Scalar::WIDTH - i - 2; ++j) {
             int32_t anchor = i * 2 + j + 1;
-            std::tie(temp[anchor], carry) = bls12_381::util::arithmetic::mac(temp[anchor], this->data[i],
-                                                                             this->data[i + j + 1], carry);
+            temp[anchor] = bls12_381::util::arithmetic::mac(temp[anchor], this->data[i], this->data[i + j + 1], carry);
         }
-        std::tie(temp[i + Scalar::WIDTH - 1], temp[i + Scalar::WIDTH]) =
-                bls12_381::util::arithmetic::mac(temp[i + Scalar::WIDTH - 1], this->data[i],
-                                                 this->data[Scalar::WIDTH - 1], carry);
+        temp[i + Scalar::WIDTH - 1] = bls12_381::util::arithmetic::mac(temp[i + Scalar::WIDTH - 1], this->data[i],
+                                                                       this->data[Scalar::WIDTH - 1], carry);
+        temp[i + Scalar::WIDTH] = carry;
     }
 
     temp[7] = temp[6] >> 63;
@@ -157,10 +157,9 @@ Scalar Scalar::square() const {
     temp[0] = 0;
     for (int i = 0; i < Scalar::WIDTH * 2; ++i) {
         if (i % 2 == 0) {
-            std::tie(temp[i], carry) = bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2],
-                                                                        carry);
+            temp[i] = bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2], carry);
         } else {
-            std::tie(temp[i], carry) = bls12_381::util::arithmetic::adc(temp[i], 0, carry);
+            temp[i] = bls12_381::util::arithmetic::adc(temp[i], 0, carry);
         }
     }
 
@@ -336,7 +335,7 @@ Scalar &Scalar::operator+=(const Scalar &rhs) {
     uint64_t carry = 0;
     uint64_t d[Scalar::WIDTH];
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(d[i], carry) = bls12_381::util::arithmetic::adc(this->data[i], rhs.data[i], carry);
+        d[i] = bls12_381::util::arithmetic::adc(this->data[i], rhs.data[i], carry);
     *this = Scalar({d[0], d[1], d[2], d[3]}).subtract_modulus();
     return *this;
 }
@@ -345,12 +344,10 @@ Scalar &Scalar::operator-=(const Scalar &rhs) {
     uint64_t borrow = 0;
     uint64_t d[Scalar::WIDTH];
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(d[i], borrow) = bls12_381::util::arithmetic::sbb(this->data[i], rhs.data[i], borrow);
-
+        d[i] = bls12_381::util::arithmetic::sbb(this->data[i], rhs.data[i], borrow);
     uint64_t carry = 0;
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(d[i], carry) = bls12_381::util::arithmetic::adc(d[i], constant::MODULUS.data[i] & borrow, carry);
-
+        d[i] = bls12_381::util::arithmetic::adc(d[i], constant::MODULUS.data[i] & borrow, carry);
     *this = Scalar({d[0], d[1], d[2], d[3]});
     return *this;
 }
@@ -362,11 +359,10 @@ Scalar &Scalar::operator*=(const Scalar &rhs) {
     for (int i = 0; i < Scalar::WIDTH; ++i) {
         carry = 0;
         for (int j = 0; j < Scalar::WIDTH - 1; ++j)
-            std::tie(temp[i + j], carry) = bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + j], this->data[i],
-                                                                            rhs.data[j], carry);
-        std::tie(temp[i + Scalar::WIDTH - 1], temp[i + Scalar::WIDTH]) =
-                bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + Scalar::WIDTH - 1], this->data[i],
-                                                 rhs.data[Scalar::WIDTH - 1], carry);
+            temp[i + j] = bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + j], this->data[i], rhs.data[j], carry);
+        temp[i + Scalar::WIDTH - 1] = bls12_381::util::arithmetic::mac(
+                i == 0 ? 0 : temp[i + Scalar::WIDTH - 1], this->data[i], rhs.data[Scalar::WIDTH - 1], carry);
+        temp[i + Scalar::WIDTH] = carry;
     }
 
     *this = Scalar::montgomery_reduce(temp);
@@ -378,8 +374,7 @@ Scalar Scalar::operator-() const {
     uint64_t d[Scalar::WIDTH];
 
     for (int i = 0; i < Scalar::WIDTH; ++i)
-        std::tie(d[i], borrow) =
-                bls12_381::util::arithmetic::sbb(constant::MODULUS.data[i], this->data[i], borrow);
+        d[i] = bls12_381::util::arithmetic::sbb(constant::MODULUS.data[i], this->data[i], borrow);
 
     const bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3]) == 0;
     const uint64_t mask = static_cast<uint64_t>(dec) - 1;

@@ -30,7 +30,8 @@ G1Affine::G1Affine(G1Projective &&point) : x{field::Fp::zero()}, y{field::Fp::on
     if (!z_inv.is_zero()) *this = temp;
 }
 
-G1Affine::G1Affine(field::Fp &&x, field::Fp &&y, bool infinity) : x{std::move(x)}, y{std::move(y)}, infinity{infinity} {}
+G1Affine::G1Affine(field::Fp &&x, field::Fp &&y, bool infinity) : x{std::move(x)}, y{std::move(y)},
+                                                                  infinity{infinity} {}
 
 G1Affine G1Affine::identity() noexcept {
     return G1Affine{};
@@ -185,16 +186,16 @@ G1Affine G1Affine::operator-() const {
     };
 }
 
-G1Projective operator+(const G1Affine &a, const G1Projective &b) {
-    return G1Projective(b) += a;
+G1Projective G1Affine::operator+(const G1Projective &rhs) const {
+    return G1Projective(rhs) += *this;
 }
 
-G1Projective operator-(const G1Affine &a, const G1Projective &b) {
-    return -G1Projective(b) += a;
+G1Projective G1Affine::operator-(const G1Projective &rhs) const {
+    return -G1Projective(rhs) += *this;
 }
 
-G1Projective operator*(const G1Affine &a, const scalar::Scalar &b) {
-    return G1Projective(a) *= b;
+G1Projective G1Affine::operator*(const scalar::Scalar &rhs) const {
+    return G1Projective{*this} *= rhs;
 }
 
 } // namespace bls12_381::group

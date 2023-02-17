@@ -47,11 +47,12 @@ Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
 
     for (int i = 0; i < Fp::WIDTH; ++i) {
         k = r[i] * constant::INV;
-        std::tie(r[0], carry) = bls12_381::util::arithmetic::mac(r[i], k, constant::MODULUS[0], 0);
+        carry = 0;
+        r[0] = util::arithmetic::mac(r[i], k, constant::MODULUS[0], carry);
         for (int j = 1; j < Fp::WIDTH; ++j)
-            std::tie(r[i + j], carry) = bls12_381::util::arithmetic::mac(r[i + j], k, constant::MODULUS[j], carry);
-        std::tie(r[i + Fp::WIDTH], r[(i + Fp::WIDTH + 1) % (Fp::WIDTH * 2)]) =
-                bls12_381::util::arithmetic::adc(ts[i + Fp::WIDTH], r[i + Fp::WIDTH], carry);
+            r[i + j] = bls12_381::util::arithmetic::mac(r[i + j], k, constant::MODULUS[j], carry);
+        r[i + Fp::WIDTH] = bls12_381::util::arithmetic::adc(ts[i + Fp::WIDTH], r[i + Fp::WIDTH], carry);
+        r[(i + Fp::WIDTH + 1) % (Fp::WIDTH * 2)] = carry;
     }
 
     return Fp({r[6], r[7], r[8], r[9], r[10], r[11]}).subtract_modulus();
@@ -62,25 +63,26 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
     const auto len = static_cast<int32_t>(a.size());
 
     uint64_t u[Fp::WIDTH] = {0};
+    uint64_t carry = 0;
 
     for (int j = 0; j < Fp::WIDTH; ++j) {
         uint64_t t[Fp::WIDTH + 1] = {0};
         std::copy(u, u + Fp::WIDTH, t);
         for (int i = 0; i < len; ++i) {
-            uint64_t carry = 0;
+            carry = 0;
             for (int k = 0; k < Fp::WIDTH; ++k)
-                std::tie(t[k], carry) = bls12_381::util::arithmetic::mac(t[k], a[i].data[j], b[i].data[k], carry);
-            std::tie(t[Fp::WIDTH], std::ignore) = bls12_381::util::arithmetic::adc(t[Fp::WIDTH], 0, carry);
+                t[k] = bls12_381::util::arithmetic::mac(t[k], a[i].data[j], b[i].data[k], carry);
+            t[Fp::WIDTH] = bls12_381::util::arithmetic::adc(t[Fp::WIDTH], 0, carry);
         }
 
         uint64_t r[Fp::WIDTH + 1] = {0};
-        uint64_t carry = 0;
         uint64_t k = t[0] * constant::INV;
-        std::tie(std::ignore, carry) = bls12_381::util::arithmetic::mac(t[0], k, constant::MODULUS[0], carry);
+        carry = 0;
+        bls12_381::util::arithmetic::mac(t[0], k, constant::MODULUS[0], carry);
 
         for (int i = 1; i < Fp::WIDTH; ++i)
-            std::tie(r[i], carry) = bls12_381::util::arithmetic::mac(t[i], k, constant::MODULUS[i], carry);
-        std::tie(r[Fp::WIDTH], std::ignore) = bls12_381::util::arithmetic::adc(t[Fp::WIDTH], 0, carry);
+            r[i] = bls12_381::util::arithmetic::mac(t[i], k, constant::MODULUS[i], carry);
+        r[Fp::WIDTH] = bls12_381::util::arithmetic::adc(t[Fp::WIDTH], 0, carry);
 
         for (int i = 0; i < Fp::WIDTH; ++i)
             u[i] = r[i + 1];
@@ -104,7 +106,7 @@ std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::BYTE_SIZE> &bytes
     // try to subtract the modulus
     uint64_t borrow = 0;
     for (int i = 0; i < Fp::WIDTH; ++i)
-        std::tie(std::ignore, borrow) = bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS[i], borrow);
+        bls12_381::util::arithmetic::sbb(temp.data[i], constant::MODULUS[i], borrow);
 
     // if the element is smaller than the modulus, the subtraction would underflow, generating a `borrow` of
     // 0xfff...fff. Otherwise, it would be 0.
@@ -139,9 +141,8 @@ bool Fp::lexicographically_largest() const {
     };
 
     uint64_t borrow = 0;
-    for (int i = 0; i < WIDTH; ++i) {
-        std::tie(std::ignore, borrow) = bls12_381::util::arithmetic::sbb(temp.data[i], subs[i], borrow);
-    }
+    for (int i = 0; i < WIDTH; ++i)
+        bls12_381::util::arithmetic::sbb(temp.data[i], subs[i], borrow);
 
     // If the element is smaller, the subtraction would underflow, producing a borrow of 0xfff...fff,
     // otherwise, it will be 0x000...000.
@@ -184,12 +185,11 @@ Fp Fp::square() const {
         carry = 0;
         for (int j = 0; j < Fp::WIDTH - i - 2; ++j) {
             int32_t anchor = i * 2 + j + 1;
-            std::tie(temp[anchor], carry) = bls12_381::util::arithmetic::mac(temp[anchor], this->data[i],
-                                                                             this->data[i + j + 1], carry);
+            temp[anchor] = bls12_381::util::arithmetic::mac(temp[anchor], this->data[i], this->data[i + j + 1], carry);
         }
-        std::tie(temp[i + Fp::WIDTH - 1], temp[i + Fp::WIDTH]) =
-                bls12_381::util::arithmetic::mac(temp[i + Fp::WIDTH - 1], this->data[i], this->data[Fp::WIDTH - 1],
-                                                 carry);
+        temp[i + Fp::WIDTH - 1] = bls12_381::util::arithmetic::mac(temp[i + Fp::WIDTH - 1], this->data[i],
+                                                                   this->data[Fp::WIDTH - 1], carry);
+        temp[i + Fp::WIDTH] = carry;
     }
 
     temp[11] = temp[10] >> 63;
@@ -200,10 +200,9 @@ Fp Fp::square() const {
     temp[0] = 0;
     for (int i = 0; i < Fp::WIDTH * 2; ++i) {
         if (i % 2 == 0) {
-            std::tie(temp[i], carry) =
-                    bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2], carry);
+            temp[i] = bls12_381::util::arithmetic::mac(temp[i], this->data[i / 2], this->data[i / 2], carry);
         } else {
-            std::tie(temp[i], carry) = bls12_381::util::arithmetic::adc(temp[i], 0, carry);
+            temp[i] = bls12_381::util::arithmetic::adc(temp[i], 0, carry);
         }
     }
     return Fp::montgomery_reduce(temp);
@@ -215,7 +214,7 @@ Fp Fp::subtract_modulus() const {
     uint64_t d[Fp::WIDTH] = {0};
 
     for (int i = 0; i < Fp::WIDTH; ++i)
-        std::tie(r[i], borrow) = bls12_381::util::arithmetic::sbb(this->data[i], constant::MODULUS[i], borrow);
+        r[i] = bls12_381::util::arithmetic::sbb(this->data[i], constant::MODULUS[i], borrow);
 
     // If underflow occurs on the final limb, borrow = 0xfff...fff, otherwise borrow = 0x000...000.
     // Thus, we use it as a mask.
@@ -285,7 +284,7 @@ Fp &Fp::operator+=(const Fp &rhs) {
     uint64_t carry = 0;
     uint64_t d[Fp::WIDTH];
     for (int i = 0; i < Fp::WIDTH; ++i)
-        std::tie(d[i], carry) = bls12_381::util::arithmetic::adc(this->data[i], rhs.data[i], carry);
+        d[i] = bls12_381::util::arithmetic::adc(this->data[i], rhs.data[i], carry);
     *this = Fp({d[0], d[1], d[2], d[3], d[4], d[5]}).subtract_modulus();
     return *this;
 }
@@ -302,11 +301,11 @@ Fp &Fp::operator*=(const Fp &rhs) {
     for (int i = 0; i < Fp::WIDTH; ++i) {
         carry = 0;
         for (int j = 0; j < Fp::WIDTH - 1; ++j)
-            std::tie(temp[i + j], carry) =
-                    bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + j], this->data[i], rhs.data[j], carry);
-        std::tie(temp[i + Fp::WIDTH - 1], temp[i + Fp::WIDTH]) =
-                bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + Fp::WIDTH - 1], this->data[i],
-                                                 rhs.data[Fp::WIDTH - 1], carry);
+            temp[i + j] = bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + j], this->data[i], rhs.data[j],
+                                                           carry);
+        temp[i + Fp::WIDTH - 1] = bls12_381::util::arithmetic::mac(i == 0 ? 0 : temp[i + Fp::WIDTH - 1], this->data[i],
+                                                                   rhs.data[Fp::WIDTH - 1], carry);
+        temp[i + Fp::WIDTH] = carry;
     }
 
     *this = Fp::montgomery_reduce(temp);
@@ -318,7 +317,7 @@ Fp Fp::operator-() const {
     uint64_t d[Fp::WIDTH];
 
     for (int i = 0; i < Fp::WIDTH; ++i)
-        std::tie(d[i], borrow) = bls12_381::util::arithmetic::sbb(constant::MODULUS[i], this->data[i], borrow);
+        d[i] = bls12_381::util::arithmetic::sbb(constant::MODULUS[i], this->data[i], borrow);
 
     bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3] | this->data[4] | this->data[5]) == 0;
     uint64_t mask = static_cast<uint64_t>(dec) - 1;
@@ -329,6 +328,34 @@ Fp Fp::operator-() const {
                     d[3] & mask, d[4] & mask, d[5] & mask
             }
     );
+}
+
+Fp Fp::operator+(const Fp &rhs) const {
+    uint64_t carry = 0;
+    uint64_t d[Fp::WIDTH];
+    for (int i = 0; i < Fp::WIDTH; ++i)
+        d[i] = bls12_381::util::arithmetic::adc(this->data[i], rhs.data[i], carry);
+    return Fp({d[0], d[1], d[2], d[3], d[4], d[5]}).subtract_modulus();
+}
+
+Fp Fp::operator-(const Fp &rhs) const {
+    return *this + -rhs;
+}
+
+Fp Fp::operator*(const Fp &rhs) const {
+    uint64_t carry = 0;
+    std::array<uint64_t, Fp::WIDTH * 2> temp{0};
+
+    for (int i = 0; i < Fp::WIDTH; ++i) {
+        carry = 0;
+        for (int j = 0; j < Fp::WIDTH - 1; ++j)
+            temp[i + j] = bls12_381::util::arithmetic::mac(
+                    i == 0 ? 0 : temp[i + j], this->data[i], rhs.data[j], carry);
+        temp[i + Fp::WIDTH - 1] = bls12_381::util::arithmetic::mac(
+                i == 0 ? 0 : temp[i + Fp::WIDTH - 1], this->data[i], rhs.data[Fp::WIDTH - 1], carry);
+        temp[i + Fp::WIDTH] = carry;
+    }
+    return Fp::montgomery_reduce(temp);
 }
 
 } // namespace bls12_381::field

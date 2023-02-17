@@ -150,4 +150,22 @@ Fp12 Fp12::operator-() const {
     };
 }
 
+Fp12 Fp12::operator+(const Fp12 &rhs) const {
+    return Fp12{this->c0 + rhs.c0, this->c1 + rhs.c1};
+}
+
+Fp12 Fp12::operator-(const Fp12 &rhs) const {
+    return Fp12{this->c0 - rhs.c0, this->c1 - rhs.c1};
+}
+
+Fp12 Fp12::operator*(const Fp12 &rhs) const {
+    const Fp6 aa = this->c0 * rhs.c0;
+    const Fp6 bb = this->c1 * rhs.c1;
+
+    Fp6 s0 = bb.mul_by_non_residue() + aa;
+    Fp6 s1 = (this->c1 + this->c0) * (rhs.c0 + rhs.c1) - aa - bb;
+
+    return Fp12{s0, s1};
+}
+
 } // namespace bls12_381::field

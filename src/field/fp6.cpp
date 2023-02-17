@@ -214,4 +214,16 @@ Fp6 Fp6::operator-() const {
     };
 }
 
+Fp6 Fp6::operator+(const Fp6 &rhs) const {
+    return Fp6{this->c0 + rhs.c0, this->c1 + rhs.c1, this->c2 + rhs.c2};
+}
+
+Fp6 Fp6::operator-(const Fp6 &rhs) const {
+    return Fp6{this->c0 - rhs.c0, this->c1 - rhs.c1, this->c2 - rhs.c2};
+}
+
+Fp6 Fp6::operator*(const Fp6 &rhs) const {
+    return this->mul_interleaved(rhs);
+}
+
 } // namespace bls12_381::field

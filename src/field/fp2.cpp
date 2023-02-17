@@ -175,14 +175,9 @@ Fp2 &Fp2::operator-=(const Fp2 &rhs) {
 }
 
 Fp2 &Fp2::operator*=(const Fp2 &rhs) {
-    const std::vector<Fp> arr00 = {this->c0, -this->c1};
-    const std::vector<Fp> arr01 = {rhs.c0, rhs.c1};
-    const std::vector<Fp> arr10 = {this->c0, this->c1};
-    const std::vector<Fp> arr11 = {rhs.c1, rhs.c0};
-
     *this = Fp2{
-            Fp::sum_of_products(arr00, arr01),
-            Fp::sum_of_products(arr10, arr11)
+            Fp::sum_of_products({this->c0, -this->c1}, {rhs.c0, rhs.c1}),
+            Fp::sum_of_products({this->c0, this->c1}, {rhs.c1, rhs.c0})
     };
     return *this;
 }
@@ -191,6 +186,21 @@ Fp2 Fp2::operator-() const {
     return Fp2{
             -this->c0,
             -this->c1
+    };
+}
+
+Fp2 Fp2::operator+(const Fp2 &rhs) const {
+    return Fp2{this->c0 + rhs.c0, this->c1 + rhs.c1};
+}
+
+Fp2 Fp2::operator-(const Fp2 &rhs) const {
+    return Fp2{this->c0 - rhs.c0, this->c1 - rhs.c1};
+}
+
+Fp2 Fp2::operator*(const Fp2 &rhs) const {
+    return Fp2{
+            Fp::sum_of_products({this->c0, -this->c1}, {rhs.c0, rhs.c1}),
+            Fp::sum_of_products({this->c0, this->c1}, {rhs.c1, rhs.c0})
     };
 }
 

@@ -54,21 +54,17 @@ public:
 
     G1Projective &operator+=(const G1Projective &rhs);
     G1Projective &operator-=(const G1Projective &rhs);
-
     G1Projective &operator+=(const G1Affine &rhs);
     G1Projective &operator-=(const G1Affine &rhs);
-
     G1Projective &operator*=(const scalar::Scalar &rhs);
 
+    G1Projective operator+(const G1Projective &rhs) const;
+    G1Projective operator-(const G1Projective &rhs) const;
+    G1Projective operator+(const G1Affine &rhs) const;
+    G1Projective operator-(const G1Affine &rhs) const;
+    G1Projective operator*(const scalar::Scalar &rhs) const;
+
 public:
-    friend inline G1Projective operator+(const G1Projective &a, const G1Affine &b) { return G1Projective(a) += b; }
-    friend inline G1Projective operator-(const G1Projective &a, const G1Affine &b) { return G1Projective(a) -= b; }
-
-    friend inline G1Projective operator+(const G1Projective &a, const G1Projective &b) { return G1Projective(a) += b; }
-    friend inline G1Projective operator-(const G1Projective &a, const G1Projective &b) { return G1Projective(a) -= b; }
-
-    friend inline G1Projective operator*(const G1Projective &a, const scalar::Scalar &b) { return G1Projective(a) *= b; }
-
     friend inline bool operator==(const G1Projective &a, const G1Projective &b) {
         field::Fp x1 = a.x * b.z;
         field::Fp x2 = b.x * a.z;

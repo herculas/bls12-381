@@ -55,15 +55,16 @@ public:
     Fp operator-() const;
     Fp &operator=(Fp &&rhs) noexcept;
     Fp &operator=(const Fp &rhs);
+
     Fp &operator+=(const Fp &rhs);
     Fp &operator-=(const Fp &rhs);
     Fp &operator*=(const Fp &rhs);
 
-public:
-    friend inline Fp operator+(const Fp &a, const Fp &b) { return Fp(a) += b; }
-    friend inline Fp operator-(const Fp &a, const Fp &b) { return Fp(a) -= b; }
-    friend inline Fp operator*(const Fp &a, const Fp &b) { return Fp(a) *= b; }
+    Fp operator+(const Fp &rhs) const;
+    Fp operator-(const Fp &rhs) const;
+    Fp operator*(const Fp &rhs) const;
 
+public:
     friend inline bool operator==(const Fp &a, const Fp &b) { return a.data == b.data; }
     friend inline bool operator!=(const Fp &a, const Fp &b) { return a.data != b.data; }
 };

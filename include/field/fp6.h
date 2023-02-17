@@ -54,11 +54,11 @@ public:
     Fp6 &operator-=(const Fp6 &rhs);
     Fp6 &operator*=(const Fp6 &rhs);
 
-public:
-    friend inline Fp6 operator+(const Fp6 &a, const Fp6 &b) { return Fp6(a) += b; }
-    friend inline Fp6 operator-(const Fp6 &a, const Fp6 &b) { return Fp6(a) -= b; }
-    friend inline Fp6 operator*(const Fp6 &a, const Fp6 &b) { return Fp6(a) *= b; }
+    Fp6 operator+(const Fp6 &rhs) const;
+    Fp6 operator-(const Fp6 &rhs) const;
+    Fp6 operator*(const Fp6 &rhs) const;
 
+public:
     friend inline bool operator==(const Fp6 &a, const Fp6 &b) { return a.c0 == b.c0 && a.c1 == b.c1 && a.c2 == b.c2; }
     friend inline bool operator!=(const Fp6 &a, const Fp6 &b) { return a.c0 != b.c0 || a.c1 != b.c1 || a.c2 != b.c2; }
 };
