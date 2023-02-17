@@ -1,7 +1,5 @@
 #include "field/fp2.h"
 
-#include <string>
-
 namespace bls12_381::field {
 
 Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
