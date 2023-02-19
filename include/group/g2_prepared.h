@@ -16,7 +16,7 @@ private:
     std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coefficients;
 
 public:
-    G2Prepared(bool infinity, const std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> &coefficients);
+    G2Prepared(bool infinity, std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coefficients);
     explicit G2Prepared(const G2Affine &point);
     explicit G2Prepared(G2Affine &&point);
 

@@ -1,6 +1,7 @@
 #include "group/g2_prepared.h"
 
 #include <cassert>
+#include <utility>
 #include <vector>
 
 #include "field/fp2.h"
@@ -10,17 +11,20 @@
 
 namespace bls12_381::group {
 
-G2Prepared::G2Prepared(bool infinity, const std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> &coefficients)
-        : infinity{infinity}, coefficients{coefficients} {}
+using field::Fp2;
+using pairing::MillerLoopDriver;
+using coeff_vec = std::vector<std::tuple<Fp2, Fp2, Fp2>>;
 
-struct Helper : pairing::MillerLoopDriver<void> {
+G2Prepared::G2Prepared(bool infinity, coeff_vec coefficients)
+        : infinity{infinity}, coefficients{std::move(coefficients)} {}
+
+struct Helper : MillerLoopDriver<void> {
     G2Projective current;
     G2Affine base;
-    std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coefficients;
+    coeff_vec coefficients;
 
-    Helper(G2Projective current, G2Affine base,
-           const std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> &coefficients)
-            : current{std::move(current)}, base{std::move(base)}, coefficients{coefficients} {}
+    Helper(G2Projective current, G2Affine base, coeff_vec coefficients)
+            : current{std::move(current)}, base{std::move(base)}, coefficients{std::move(coefficients)} {}
 
     void doubling_step() override {
         auto coeffs = pairing::doubling_step(this->current);
@@ -42,7 +46,7 @@ struct Helper : pairing::MillerLoopDriver<void> {
 G2Prepared::G2Prepared(const G2Affine &point) : infinity{}, coefficients{} {
     bool is_identity = point.is_identity();
     G2Affine q = (is_identity) ? G2Affine::generator() : point;
-    std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coeffs_temp;
+    coeff_vec coeffs_temp;
     coeffs_temp.reserve(68);
     Helper helper{G2Projective{q}, q, coeffs_temp};
     pairing::miller_loop(helper);
@@ -54,7 +58,7 @@ G2Prepared::G2Prepared(const G2Affine &point) : infinity{}, coefficients{} {
 G2Prepared::G2Prepared(G2Affine &&point) : infinity{}, coefficients{} {
     bool is_identity = point.is_identity();
     G2Affine q = (is_identity) ? G2Affine::generator() : point;
-    std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> coeffs_temp;
+    coeff_vec coeffs_temp;
     coeffs_temp.reserve(68);
     Helper helper{G2Projective{q}, q, coeffs_temp};
     pairing::miller_loop(helper);
@@ -67,7 +71,7 @@ bool G2Prepared::is_identity() const {
     return this->infinity;
 }
 
-std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> G2Prepared::get_coeffs() const {
+coeff_vec G2Prepared::get_coeffs() const {
     return this->coefficients;
 }
 

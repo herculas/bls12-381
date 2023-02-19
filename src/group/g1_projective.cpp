@@ -10,23 +10,25 @@
 
 namespace bls12_381::group {
 
-G1Projective::G1Projective() : x{field::Fp::zero()}, y{field::Fp::one()}, z{field::Fp::zero()} {}
+using field::Fp;
+using scalar::Scalar;
+using util::random::get_random;
+
+G1Projective::G1Projective() : x{Fp::zero()}, y{Fp::one()}, z{Fp::zero()} {}
 
 G1Projective::G1Projective(const G1Projective &point) = default;
 
 G1Projective::G1Projective(const G1Affine &point)
-        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
-G1Projective::G1Projective(const field::Fp &x, const field::Fp &y, const field::Fp &z)
-        : x{x}, y{y}, z{z} {}
+G1Projective::G1Projective(const Fp &x, const Fp &y, const Fp &z) : x{x}, y{y}, z{z} {}
 
 G1Projective::G1Projective(G1Projective &&point) noexcept = default;
 
 G1Projective::G1Projective(G1Affine &&point)
-        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? field::Fp::zero() : field::Fp::one()} {}
+        : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
-G1Projective::G1Projective(field::Fp &&x, field::Fp &&y, field::Fp &&z)
-        : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
+G1Projective::G1Projective(Fp &&x, Fp &&y, Fp &&z) : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
 
 G1Projective G1Projective::identity() noexcept {
     return G1Projective{};
@@ -34,25 +36,25 @@ G1Projective G1Projective::identity() noexcept {
 
 G1Projective G1Projective::generator() noexcept {
     return G1Projective{
-            field::Fp({
-                              0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
-                              0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75,
-                      }),
-            field::Fp({
-                              0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce,
-                              0x51ac582950405194, 0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a,
-                      }),
-            field::Fp::one(),
+            Fp({
+                       0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
+                       0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75,
+               }),
+            Fp({
+                       0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce,
+                       0x51ac582950405194, 0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a,
+               }),
+            Fp::one(),
     };
 }
 
 G1Projective G1Projective::random() {
     while (true) {
-        const bool flip_sign = bls12_381::util::random::get_random<uint8_t>() % 2 != 0;
-        const field::Fp rx = field::Fp::random();
+        const bool flip_sign = get_random<uint8_t>() % 2 != 0;
+        const Fp rx = Fp::random();
         const auto temp = (rx.square() * rx + field::constant::B).sqrt();
         if (!temp.has_value()) continue;
-        const field::Fp &ry = temp.value();
+        const Fp &ry = temp.value();
         const G1Affine point{rx, flip_sign ? -ry : ry, false};
         const G1Projective curve(point);
         G1Projective res = curve.clear_cofactor();
@@ -62,9 +64,9 @@ G1Projective G1Projective::random() {
 
 std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projective> &points) {
     std::vector<G1Affine> results(points.size());
-    std::vector<field::Fp> temp_xs(points.size());
+    std::vector<Fp> temp_xs(points.size());
 
-    field::Fp acc = field::Fp::one();
+    Fp acc = Fp::one();
     for (int i = 0; i < points.size(); ++i) {
         temp_xs[i] = acc;
         acc = points[i].is_identity() ? acc : (acc * points[i].z);
@@ -74,7 +76,7 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     acc = acc.invert().value();
 
     for (int i = static_cast<int32_t>(points.size()) - 1; i >= 0; --i) {
-        field::Fp temp = temp_xs[i] * acc;
+        Fp temp = temp_xs[i] * acc;
         acc = points[i].is_identity() ? acc : (acc * points[i].z);
         G1Affine r{
                 points[i].x * temp,
@@ -87,15 +89,15 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     return results;
 }
 
-field::Fp G1Projective::get_x() const noexcept {
+Fp G1Projective::get_x() const noexcept {
     return this->x;
 }
 
-field::Fp G1Projective::get_y() const noexcept {
+Fp G1Projective::get_y() const noexcept {
     return this->y;
 }
 
-field::Fp G1Projective::get_z() const noexcept {
+Fp G1Projective::get_z() const noexcept {
     return this->z;
 }
 
@@ -110,22 +112,22 @@ bool G1Projective::is_on_curve() const {
            this->z.is_zero();
 }
 
-field::Fp mul_by_3b(field::Fp &a) {
+Fp mul_by_3b(Fp &a) {
     a = a + a;
     a = a + a;
     return a + a + a;
 }
 
 G1Projective G1Projective::doubles() const {
-    field::Fp t0 = this->y.square();
-    field::Fp z3 = t0 + t0;
+    Fp t0 = this->y.square();
+    Fp z3 = t0 + t0;
     z3 = z3 + z3;
     z3 = z3 + z3;
-    field::Fp t1 = this->y * this->z;
-    field::Fp t2 = this->z.square();
+    Fp t1 = this->y * this->z;
+    Fp t2 = this->z.square();
     t2 = mul_by_3b(t2);
-    field::Fp x3 = t2 * z3;
-    field::Fp y3 = t0 + t2;
+    Fp x3 = t2 * z3;
+    Fp y3 = t0 + t2;
     z3 = t1 * z3;
     t1 = t2 + t2;
     t2 = t1 + t2;
@@ -141,28 +143,28 @@ G1Projective G1Projective::doubles() const {
 }
 
 G1Projective G1Projective::add(const G1Projective &rhs) const {
-    field::Fp t0 = this->x * rhs.x;
-    field::Fp t1 = this->y * rhs.y;
-    field::Fp t2 = this->z * rhs.z;
-    field::Fp t3 = this->x + this->y;
-    field::Fp t4 = rhs.x + rhs.y;
+    Fp t0 = this->x * rhs.x;
+    Fp t1 = this->y * rhs.y;
+    Fp t2 = this->z * rhs.z;
+    Fp t3 = this->x + this->y;
+    Fp t4 = rhs.x + rhs.y;
     t3 = t3 * t4;
     t4 = t0 + t1;
     t3 = t3 - t4;
     t4 = this->y + this->z;
-    field::Fp x3 = rhs.y + rhs.z;
+    Fp x3 = rhs.y + rhs.z;
     t4 = t4 * x3;
     x3 = t1 + t2;
     t4 = t4 - x3;
     x3 = this->x + this->z;
-    field::Fp y3 = rhs.x + rhs.z;
+    Fp y3 = rhs.x + rhs.z;
     x3 = x3 * y3;
     y3 = t0 + t2;
     y3 = x3 - y3;
     x3 = t0 + t0;
     t0 = x3 + t0;
     t2 = mul_by_3b(t2);
-    field::Fp z3 = t1 + t2;
+    Fp z3 = t1 + t2;
     t1 = t1 - t2;
     y3 = mul_by_3b(y3);
     x3 = t4 * y3;
@@ -178,22 +180,22 @@ G1Projective G1Projective::add(const G1Projective &rhs) const {
 }
 
 G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
-    field::Fp t0 = this->x * rhs.get_x();
-    field::Fp t1 = this->y * rhs.get_y();
-    field::Fp t3 = rhs.get_x() + rhs.get_y();
-    field::Fp t4 = this->x + this->y;
+    Fp t0 = this->x * rhs.get_x();
+    Fp t1 = this->y * rhs.get_y();
+    Fp t3 = rhs.get_x() + rhs.get_y();
+    Fp t4 = this->x + this->y;
     t3 = t3 * t4;
     t4 = t0 + t1;
     t3 = t3 - t4;
     t4 = rhs.get_y() * this->z;
     t4 = t4 + this->y;
-    field::Fp y3 = rhs.get_x() * this->z;
+    Fp y3 = rhs.get_x() * this->z;
     y3 = y3 + this->x;
-    field::Fp x3 = t0 + t0;
+    Fp x3 = t0 + t0;
     t0 = x3 + t0;
-    field::Fp te = this->z;
-    field::Fp t2 = mul_by_3b(te);
-    field::Fp z3 = t1 + t2;
+    Fp te = this->z;
+    Fp t2 = mul_by_3b(te);
+    Fp z3 = t1 + t2;
     t1 = t1 - t2;
     y3 = mul_by_3b(y3);
     x3 = t4 * y3;
@@ -272,7 +274,7 @@ G1Projective &G1Projective::operator-=(const G1Affine &rhs) {
     return *this;
 }
 
-G1Projective &G1Projective::operator*=(const scalar::Scalar &rhs) {
+G1Projective &G1Projective::operator*=(const Scalar &rhs) {
     *this = this->multiply(rhs.to_bytes());
     return *this;
 }
@@ -293,7 +295,7 @@ G1Projective G1Projective::operator-(const G1Affine &rhs) const {
     return this->add_mixed(-rhs);
 }
 
-G1Projective G1Projective::operator*(const scalar::Scalar &rhs) const {
+G1Projective G1Projective::operator*(const Scalar &rhs) const {
     return this->multiply(rhs.to_bytes());
 }
 
