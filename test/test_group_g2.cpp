@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
+
 #include "group/g2_affine.h"
 #include "group/g2_projective.h"
 #include "group/constant.h"
+#include "scalar/scalar.h"
 
 TEST(TestG2, OnCurve) {
     EXPECT_TRUE(bls12_381::group::G2Affine::identity().is_on_curve());

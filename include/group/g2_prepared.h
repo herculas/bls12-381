@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "field/fp2.h"
-#include "g2_affine.h"
+#include "group/g2_affine.h"
 #include "pairing/miller_loop_driver.h"
 
 namespace bls12_381::group {

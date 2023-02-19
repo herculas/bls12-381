@@ -1,6 +1,10 @@
 #ifndef BLS12_381_FP12_H
 #define BLS12_381_FP12_H
 
+#include <optional>
+
+#include "fp.h"
+#include "fp2.h"
 #include "fp6.h"
 
 namespace bls12_381::field {

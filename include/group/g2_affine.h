@@ -1,8 +1,11 @@
 #ifndef BLS12_381_G2_AFFINE_H
 #define BLS12_381_G2_AFFINE_H
 
+#include <array>
+#include <cstdint>
+#include <optional>
+
 #include "field/fp2.h"
-#include "scalar/scalar.h"
 
 namespace bls12_381::scalar { class Scalar; }
 namespace bls12_381::group { class G2Projective; }

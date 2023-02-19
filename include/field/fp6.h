@@ -1,12 +1,9 @@
 #ifndef BLS12_381_FP6_H
 #define BLS12_381_FP6_H
 
-#include <array>
-#include <cstdint>
 #include <optional>
-#include <string>
-#include <vector>
 
+#include "fp.h"
 #include "fp2.h"
 
 namespace bls12_381::field {

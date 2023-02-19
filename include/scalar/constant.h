@@ -1,6 +1,8 @@
 #ifndef BLS12_381_SCALAR_CONSTANT_H
 #define BLS12_381_SCALAR_CONSTANT_H
 
+#include <cstdint>
+
 #include "scalar/scalar.h"
 
 namespace bls12_381::scalar::constant {

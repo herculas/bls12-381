@@ -2,6 +2,7 @@
 
 #include "group/gt.h"
 #include "pairing/pairing.h"
+#include "scalar/scalar.h"
 
 TEST(TestPairing, GtGenerator) {
     bls12_381::group::Gt p1 = bls12_381::group::Gt::generator();

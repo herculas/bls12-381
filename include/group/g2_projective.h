@@ -1,6 +1,10 @@
 #ifndef BLS12_381_G2_PROJECTIVE_H
 #define BLS12_381_G2_PROJECTIVE_H
 
+#include <array>
+#include <cstdint>
+#include <vector>
+
 #include "field/fp2.h"
 
 namespace bls12_381::scalar { class Scalar; }

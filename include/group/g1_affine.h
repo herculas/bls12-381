@@ -1,6 +1,10 @@
 #ifndef BLS12_381_G1_AFFINE_H
 #define BLS12_381_G1_AFFINE_H
 
+#include <array>
+#include <cstdint>
+#include <optional>
+
 #include "field/fp.h"
 
 namespace bls12_381::scalar { class Scalar; }

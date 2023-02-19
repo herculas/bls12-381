@@ -4,6 +4,7 @@
 #include <tuple>
 #include <vector>
 
+#include "group/g1_affine.h"
 #include "group/g2_prepared.h"
 #include "pairing/miller_loop_result.h"
 #include "pairing/miller_loop_driver.h"
