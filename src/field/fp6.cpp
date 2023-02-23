@@ -2,6 +2,8 @@
 
 namespace bls12_381::field {
 
+using rng::core::RngCore;
+
 Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
 Fp6::Fp6(const Fp6 &fp) = default;
@@ -36,11 +38,11 @@ Fp6 Fp6::one() noexcept {
     };
 }
 
-Fp6 Fp6::random() {
+Fp6 Fp6::random(RngCore &rng) {
     return Fp6{
-            Fp2::random(),
-            Fp2::random(),
-            Fp2::random()
+            Fp2::random(rng),
+            Fp2::random(rng),
+            Fp2::random(rng),
     };
 }
 

@@ -2,21 +2,22 @@
 
 #include <cassert>
 
+#include "utils/bit.h"
+
 #include "field/constant.h"
 #include "utils/arith.h"
-#include "utils/bit.h"
 #include "utils/encode.h"
-#include "utils/random.h"
 
 namespace bls12_381::field {
+
+using rng::core::RngCore;
+using rng::util::bit::from_be_bytes;
+using rng::util::bit::to_be_bytes;
 
 using util::arithmetic::adc;
 using util::arithmetic::sbb;
 using util::arithmetic::mac;
-using util::bit_operation::be_bytes_to_uint64;
-using util::bit_operation::uint64_to_be_bytes;
 using util::encoding::hex_str;
-using util::random::get_random;
 
 Fp::Fp() : data{0} {}
 
@@ -38,11 +39,20 @@ Fp Fp::one() noexcept {
     return constant::R1;
 }
 
-Fp Fp::random() {
-    std::array<uint64_t, Fp::WIDTH * 2> randoms{};
-    for (uint64_t &random: randoms)
-        random = get_random<uint64_t>();
-    return Fp::reduce(randoms);
+Fp Fp::random(RngCore &rng) {
+    std::array<uint8_t, Fp::BYTE_SIZE * 2> randoms{};
+    rng.fill_bytes(randoms);
+
+    std::array<uint64_t, Fp::WIDTH * 2> bytes{};
+    for (int i = 0; i < bytes.size(); ++i) {
+        bytes[i] = from_be_bytes<uint64_t>(
+                {
+                        randoms[8 * i + 0], randoms[8 * i + 1], randoms[8 * i + 2], randoms[8 * i + 3],
+                        randoms[8 * i + 4], randoms[8 * i + 5], randoms[8 * i + 6], randoms[8 * i + 7],
+                }
+        );
+    }
+    return Fp::reduce(bytes);
 }
 
 Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
@@ -107,7 +117,7 @@ std::optional<Fp> Fp::from_bytes(const std::array<uint8_t, Fp::BYTE_SIZE> &bytes
     for (int i = 0; i < bytes.size(); ++i)
         array[i / sizeof(uint64_t)][i % sizeof(uint64_t)] = bytes[i];
     for (int i = 0; i < data.size(); ++i)
-        data[i] = be_bytes_to_uint64(array[Fp::WIDTH - i - 1]);
+        data[i] = from_be_bytes<uint64_t>(array[Fp::WIDTH - i - 1]);
 
     Fp temp({data[0], data[1], data[2], data[3], data[4], data[5]});
 
@@ -170,7 +180,7 @@ std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     std::array<uint8_t, Fp::BYTE_SIZE> bytes{0};
 
     for (int i = 0; i < Fp::WIDTH; ++i) {
-        temp = uint64_to_be_bytes(point.data[Fp::WIDTH - 1 - i]);
+        temp = to_be_bytes<uint64_t>(point.data[Fp::WIDTH - 1 - i]);
         for (int j = 0; j < sizeof(uint64_t); ++j)
             bytes[i * 8 + j] = temp[j];
     }

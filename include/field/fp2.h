@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "core/rng.h"
+
 #include "fp.h"
 
 namespace bls12_381::field {
@@ -29,7 +31,7 @@ public:
 
     static Fp2 zero() noexcept;
     static Fp2 one() noexcept;
-    static Fp2 random();
+    static Fp2 random(rng::core::RngCore &rng);
 
     [[nodiscard]] Fp get_c0() const noexcept;
     [[nodiscard]] Fp get_c1() const noexcept;

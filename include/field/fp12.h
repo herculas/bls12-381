@@ -3,6 +3,8 @@
 
 #include <optional>
 
+#include "core/rng.h"
+
 #include "fp.h"
 #include "fp2.h"
 #include "fp6.h"
@@ -31,7 +33,7 @@ public:
 
     static Fp12 zero() noexcept;
     static Fp12 one() noexcept;
-    static Fp12 random();
+    static Fp12 random(rng::core::RngCore &rng);
 
     [[nodiscard]] Fp6 get_c0() const noexcept;
     [[nodiscard]] Fp6 get_c1() const noexcept;

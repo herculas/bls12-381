@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "core/rng.h"
+
 #include "field/fp.h"
 
 namespace bls12_381::scalar { class Scalar; }
@@ -31,7 +33,7 @@ public:
 
     static G1Projective identity() noexcept;
     static G1Projective generator() noexcept;
-    static G1Projective random();
+    static G1Projective random(rng::core::RngCore &rng);
 
     static std::vector<G1Affine> batch_normalize(const std::vector<G1Projective> &points);
 

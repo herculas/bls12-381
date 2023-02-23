@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <optional>
 
+#include "core/rng.h"
+
 #include "group/g1_affine.h"
 #include "group/g1_projective.h"
 #include "group/g2_affine.h"
@@ -32,7 +34,7 @@ public:
 
     static Scalar zero() noexcept;
     static Scalar one() noexcept;
-    static Scalar random();
+    static Scalar random(rng::core::RngCore &rng);
 
     static Scalar montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &rs);
     static Scalar from_raw(const std::array<uint64_t, Scalar::WIDTH> &values);

@@ -1,6 +1,8 @@
 #ifndef BLS12_381_GT_H
 #define BLS12_381_GT_H
 
+#include "core/rng.h"
+
 #include "field/fp12.h"
 
 namespace bls12_381::scalar { class Scalar; }
@@ -22,7 +24,7 @@ public:
 
     static Gt identity() noexcept;
     static Gt generator() noexcept;
-    static Gt random();
+    static Gt random(rng::core::RngCore &rng);
 
     [[nodiscard]] bool is_identity() const;
 

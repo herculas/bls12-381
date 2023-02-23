@@ -4,6 +4,8 @@
 
 namespace bls12_381::group {
 
+using rng::core::RngCore;
+
 using field::Fp;
 using field::Fp2;
 using field::Fp6;
@@ -95,9 +97,9 @@ Gt Gt::generator() noexcept {
     };
 }
 
-Gt Gt::random() {
+Gt Gt::random(RngCore &rng) {
     while (true) {
-        Fp12 inner = Fp12::random();
+        Fp12 inner = Fp12::random(rng);
         if (!inner.is_zero())
             return pairing::MillerLoopResult{inner}.final_exponentiation();
     }

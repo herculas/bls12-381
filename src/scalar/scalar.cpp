@@ -1,12 +1,16 @@
 #include "scalar/scalar.h"
 
+#include "utils/bit.h"
+
 #include "scalar/constant.h"
 #include "utils/arith.h"
-#include "utils/bit.h"
 #include "utils/encode.h"
-#include "utils/random.h"
 
 namespace bls12_381::scalar {
+
+using rng::core::RngCore;
+using rng::util::bit::from_le_bytes;
+using rng::util::bit::to_le_bytes;
 
 using group::G1Affine;
 using group::G1Projective;
@@ -15,10 +19,7 @@ using group::G2Projective;
 using util::arithmetic::adc;
 using util::arithmetic::sbb;
 using util::arithmetic::mac;
-using util::bit_operation::le_bytes_to_uint64;
-using util::bit_operation::uint64_to_le_bytes;
 using util::encoding::hex_str;
-using util::random::get_random;
 
 Scalar::Scalar() : data{0} {}
 
@@ -42,9 +43,9 @@ Scalar Scalar::one() noexcept {
     return constant::R1;
 }
 
-Scalar Scalar::random() {
+Scalar Scalar::random(rng::core::RngCore &rng) {
     std::array<uint8_t, Scalar::BYTE_SIZE * 2> bytes{};
-    for (uint8_t &byte: bytes) byte = get_random<uint8_t>();
+    rng.fill_bytes(bytes);
     return Scalar::from_bytes_wide(bytes);
 }
 
@@ -77,7 +78,7 @@ Scalar Scalar::from_bytes_wide(const std::array<uint8_t, Scalar::BYTE_SIZE * 2> 
     for (int i = 0; i < bytes.size(); ++i)
         array[i / sizeof(uint64_t)][i % sizeof(uint64_t)] = bytes[i];
     for (int i = 0; i < data.size(); ++i)
-        data[i] = le_bytes_to_uint64(array[i]);
+        data[i] = from_le_bytes<uint64_t>(array[i]);
 
     return Scalar::reduce(data);
 }
@@ -89,7 +90,7 @@ std::optional<Scalar> Scalar::from_bytes(const std::array<uint8_t, Scalar::BYTE_
     for (int i = 0; i < bytes.size(); ++i)
         array[i / sizeof(uint64_t)][i % sizeof(uint64_t)] = bytes[i];
     for (int i = 0; i < data.size(); ++i)
-        data[i] = le_bytes_to_uint64(array[i]);
+        data[i] = rng::util::bit::from_le_bytes<uint64_t>(array[i]);
 
     Scalar temp({data[0], data[1], data[2], data[3]});
 
@@ -134,7 +135,7 @@ std::array<uint8_t, Scalar::BYTE_SIZE> Scalar::to_bytes() const {
     std::array<uint8_t, Scalar::BYTE_SIZE> bytes{0};
 
     for (int i = 0; i < Scalar::WIDTH; ++i) {
-        temp = uint64_to_le_bytes(point.data[i]);
+        temp = to_le_bytes<uint64_t>(point.data[i]);
         for (int j = 0; j < sizeof(uint64_t); ++j)
             bytes[i * 8 + j] = temp[j];
     }

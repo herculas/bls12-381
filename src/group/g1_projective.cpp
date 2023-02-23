@@ -6,13 +6,13 @@
 #include "group/constant.h"
 #include "group/g1_affine.h"
 #include "scalar/scalar.h"
-#include "utils/random.h"
 
 namespace bls12_381::group {
 
+using rng::core::RngCore;
+
 using field::Fp;
 using scalar::Scalar;
-using util::random::get_random;
 
 G1Projective::G1Projective() : x{Fp::zero()}, y{Fp::one()}, z{Fp::zero()} {}
 
@@ -48,10 +48,10 @@ G1Projective G1Projective::generator() noexcept {
     };
 }
 
-G1Projective G1Projective::random() {
+G1Projective G1Projective::random(RngCore &rng) {
     while (true) {
-        const bool flip_sign = get_random<uint8_t>() % 2 != 0;
-        const Fp rx = Fp::random();
+        const Fp rx = Fp::random(rng);
+        const bool flip_sign = rng.get_uint32() % 2 != 0;
         const auto temp = (rx.square() * rx + field::constant::B).sqrt();
         if (!temp.has_value()) continue;
         const Fp &ry = temp.value();

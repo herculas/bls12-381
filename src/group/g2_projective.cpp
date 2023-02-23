@@ -6,14 +6,14 @@
 #include "group/constant.h"
 #include "group/g2_affine.h"
 #include "scalar/scalar.h"
-#include "utils/random.h"
 
 namespace bls12_381::group {
+
+using rng::core::RngCore;
 
 using field::Fp;
 using field::Fp2;
 using scalar::Scalar;
-using util::random::get_random;
 
 G2Projective::G2Projective() : x{Fp2::zero()}, y{Fp2::one()}, z{Fp2::zero()} {}
 
@@ -62,10 +62,10 @@ G2Projective G2Projective::generator() noexcept {
     };
 }
 
-G2Projective G2Projective::random() {
+G2Projective G2Projective::random(RngCore &rng) {
     while (true) {
-        const bool flip_sign = get_random<uint8_t>() % 2 != 0;
-        const Fp2 rx = Fp2::random();
+        const Fp2 rx = Fp2::random(rng);
+        const bool flip_sign = rng.get_uint32() % 2 != 0;
         const auto temp = (rx.square() * rx + field::constant::B2).sqrt();
         if (!temp.has_value()) continue;
         const Fp2 &ry = temp.value();

@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "core/rng.h"
+
 namespace bls12_381::field {
 
 class Fp {
@@ -29,7 +31,7 @@ public:
 
     static Fp zero() noexcept;
     static Fp one() noexcept;
-    static Fp random();
+    static Fp random(rng::core::RngCore &rng);
 
     static Fp montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts);
     static Fp sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b);
