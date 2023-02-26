@@ -1,5 +1,9 @@
 #include "field/fp2.h"
 
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif
+
 namespace bls12_381::field {
 
 using rng::core::RngCore;
@@ -90,6 +94,14 @@ Fp2 Fp2::mul_by_non_residue() const {
 
 Fp2 Fp2::pow(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp2 res = Fp2::one();
+#ifdef __cpp_lib_ranges
+    for (const uint64_t &e: exp | std::views::reverse) {
+        for (const int32_t &i: std::views::iota(0,64) | std::views::reverse) {
+            res = res.square();
+            if (((e >> i) & 0x01) == 0x01) res *= *this;
+        }
+    }
+#else
     for (int i = Fp::WIDTH - 1; i >= 0; --i) {
         for (int j = 63; j >= 0; --j) {
             res = res.square();
@@ -98,12 +110,21 @@ Fp2 Fp2::pow(const std::array<uint64_t, Fp::WIDTH> &exp) const {
             }
         }
     }
+#endif
     return res;
 }
 
 Fp2 Fp2::pow_extended(const std::vector<uint64_t> &exp) const {
-    const auto len = static_cast<int32_t>(exp.size());
     Fp2 res = Fp2::one();
+#ifdef __cpp_lib_ranges
+    for (const uint64_t &e: exp | std::views::reverse) {
+        for (const int32_t &i: std::views::iota(0,64) | std::views::reverse) {
+            res = res.square();
+            if (((e >> i) & 0x01) == 0x01) res *= *this;
+        }
+    }
+#else
+    const auto len = static_cast<int32_t>(exp.size());
     for (int i = len - 1; i >= 0; --i) {
         for (int j = 63; j >= 0; --j) {
             res = res.square();
@@ -112,6 +133,7 @@ Fp2 Fp2::pow_extended(const std::vector<uint64_t> &exp) const {
             }
         }
     }
+#endif
     return res;
 }
 

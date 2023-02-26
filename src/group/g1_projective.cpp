@@ -2,6 +2,10 @@
 
 #include <cassert>
 
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif
+
 #include "field/constant.h"
 #include "group/constant.h"
 #include "group/g1_affine.h"
@@ -214,6 +218,24 @@ G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
 
 G1Projective G1Projective::multiply(const std::array<uint8_t, 32> &bytes) const {
     G1Projective acc = G1Projective::identity();
+#ifdef __cpp_lib_ranges
+    for (const uint8_t &bit: bytes
+                          | std::views::reverse
+                          | std::views::transform([](uint8_t byte) {
+        std::vector<uint8_t> res{};
+        res.reserve(8);
+        for (const auto &i: std::views::iota(0, 8) | std::views::reverse) {
+            res.push_back((byte >> i) & static_cast<uint8_t>(1));
+        }
+        return res;
+    })
+                          | std::views::join
+                          | std::views::drop(1)
+            ) {
+        acc = acc.doubles();
+        if (bit != 0) acc = acc + *this;
+    }
+#else
     for (auto iter = bytes.rbegin(); iter != bytes.rend(); ++iter) {
         for (int i = 7; i >= 0; --i) {
             if (iter == bytes.rbegin() && i == 7) continue;
@@ -222,6 +244,7 @@ G1Projective G1Projective::multiply(const std::array<uint8_t, 32> &bytes) const 
             if (bit != 0) acc = acc + *this;
         }
     }
+#endif
     return acc;
 }
 

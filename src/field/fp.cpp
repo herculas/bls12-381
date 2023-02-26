@@ -2,6 +2,10 @@
 
 #include <cassert>
 
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif
+
 #include "utils/bit.h"
 
 #include "field/constant.h"
@@ -247,12 +251,21 @@ Fp Fp::subtract_modulus() const {
 
 Fp Fp::pow(const std::array<uint64_t, Fp::WIDTH> &exp) const {
     Fp res = Fp::one();
+#ifdef __cpp_lib_ranges
+    for (const uint64_t &e: exp | std::views::reverse) {
+        for (const int32_t &i: std::views::iota(0,64) | std::views::reverse) {
+            res = res.square();
+            if (((e >> i) & 0x01) == 0x01) res *= *this;
+        }
+    }
+#else
     for (int i = Fp::WIDTH - 1; i >= 0; i--) {
         for (int32_t j = 63; j >= 0; j--) {
             res = res.square();
             if (((exp[i] >> j) & 0x01) == 0x01) res *= *this;
         }
     }
+#endif
     return res;
 }
 
