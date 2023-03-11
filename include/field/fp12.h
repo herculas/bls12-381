@@ -5,9 +5,9 @@
 
 #include "core/rng.h"
 
-#include "fp.h"
-#include "fp2.h"
-#include "fp6.h"
+#include "field/fp.h"
+#include "field/fp2.h"
+#include "field/fp6.h"
 
 namespace bls12_381::field {
 

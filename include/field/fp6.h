@@ -5,8 +5,8 @@
 
 #include "core/rng.h"
 
-#include "fp.h"
-#include "fp2.h"
+#include "field/fp.h"
+#include "field/fp2.h"
 
 namespace bls12_381::field {
 

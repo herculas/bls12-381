@@ -2,7 +2,7 @@
 #define BLS12_381_FIELD_CONSTANT_H
 
 #include "field/fp.h"
-#include "fp2.h"
+#include "field/fp2.h"
 
 namespace bls12_381::field::constant {
 
