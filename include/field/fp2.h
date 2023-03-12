@@ -33,8 +33,8 @@ public:
     static Fp2 one() noexcept;
     static Fp2 random(rng::core::RngCore &rng);
 
-    [[nodiscard]] Fp get_c0() const noexcept;
-    [[nodiscard]] Fp get_c1() const noexcept;
+    [[nodiscard]] const Fp &get_c0() const noexcept;
+    [[nodiscard]] const Fp &get_c1() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;

@@ -37,6 +37,8 @@ public:
     static Fp sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b);
     static std::optional<Fp> from_bytes(const std::array<uint8_t, Fp::BYTE_SIZE> &bytes);
 
+    [[nodiscard]] const std::array<uint64_t, Fp::WIDTH> &get_data() const;
+
     [[nodiscard]] bool is_zero() const;
     [[nodiscard]] bool lexicographically_largest() const;
 

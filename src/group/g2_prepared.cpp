@@ -71,7 +71,7 @@ bool G2Prepared::is_identity() const {
     return this->infinity;
 }
 
-coeff_vec G2Prepared::get_coeffs() const {
+const coeff_vec &G2Prepared::get_coeffs() const {
     return this->coefficients;
 }
 

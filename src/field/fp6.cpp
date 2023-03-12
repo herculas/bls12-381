@@ -46,15 +46,15 @@ Fp6 Fp6::random(RngCore &rng) {
     };
 }
 
-Fp2 Fp6::get_c0() const noexcept {
+const Fp2 &Fp6::get_c0() const noexcept {
     return this->c0;
 }
 
-Fp2 Fp6::get_c1() const noexcept {
+const Fp2 &Fp6::get_c1() const noexcept {
     return this->c1;
 }
 
-Fp2 Fp6::get_c2() const noexcept {
+const Fp2 &Fp6::get_c2() const noexcept {
     return this->c2;
 }
 

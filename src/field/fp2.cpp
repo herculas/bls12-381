@@ -43,11 +43,11 @@ Fp2 Fp2::random(RngCore &rng) {
     };
 }
 
-Fp Fp2::get_c0() const noexcept {
+const Fp &Fp2::get_c0() const noexcept {
     return this->c0;
 }
 
-Fp Fp2::get_c1() const noexcept {
+const Fp &Fp2::get_c1() const noexcept {
     return this->c1;
 }
 

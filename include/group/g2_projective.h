@@ -37,9 +37,9 @@ public:
 
     static std::vector<G2Affine> batch_normalize(const std::vector<G2Projective> &points);
 
-    [[nodiscard]] field::Fp2 get_x() const noexcept;
-    [[nodiscard]] field::Fp2 get_y() const noexcept;
-    [[nodiscard]] field::Fp2 get_z() const noexcept;
+    [[nodiscard]] const field::Fp2 &get_x() const noexcept;
+    [[nodiscard]] const field::Fp2 &get_y() const noexcept;
+    [[nodiscard]] const field::Fp2 &get_z() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;

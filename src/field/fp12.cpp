@@ -47,11 +47,11 @@ Fp12 Fp12::random(RngCore &rng) {
     };
 }
 
-Fp6 Fp12::get_c0() const noexcept {
+const Fp6 &Fp12::get_c0() const noexcept {
     return this->c0;
 }
 
-Fp6 Fp12::get_c1() const noexcept {
+const Fp6 &Fp12::get_c1() const noexcept {
     return this->c1;
 }
 

@@ -99,15 +99,15 @@ std::vector<G2Affine> G2Projective::batch_normalize(const std::vector<G2Projecti
     return results;
 }
 
-Fp2 G2Projective::get_x() const noexcept {
+const Fp2 &G2Projective::get_x() const noexcept {
     return this->x;
 }
 
-Fp2 G2Projective::get_y() const noexcept {
+const Fp2 &G2Projective::get_y() const noexcept {
     return this->y;
 }
 
-Fp2 G2Projective::get_z() const noexcept {
+const Fp2 &G2Projective::get_z() const noexcept {
     return this->z;
 }
 

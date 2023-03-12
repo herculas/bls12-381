@@ -35,8 +35,8 @@ public:
     static Fp12 one() noexcept;
     static Fp12 random(rng::core::RngCore &rng);
 
-    [[nodiscard]] Fp6 get_c0() const noexcept;
-    [[nodiscard]] Fp6 get_c1() const noexcept;
+    [[nodiscard]] const Fp6 &get_c0() const noexcept;
+    [[nodiscard]] const Fp6 &get_c1() const noexcept;
 
     [[nodiscard]] bool is_zero() const;
 

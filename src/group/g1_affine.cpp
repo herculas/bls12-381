@@ -1,5 +1,7 @@
 #include "group/g1_affine.h"
 
+#include "utils/bit.h"
+
 #include "field/constant.h"
 #include "group/g1_projective.h"
 #include "scalar/scalar.h"
@@ -7,6 +9,8 @@
 namespace bls12_381::group {
 
 using field::Fp;
+using rng::util::bit::from_le_bytes;
+using rng::util::bit::to_le_bytes;
 
 G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}
 
@@ -124,11 +128,36 @@ G1Affine::from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_S
     }
 }
 
-Fp G1Affine::get_x() const noexcept {
+G1Affine G1Affine::from_slice_unchecked(const std::vector<uint8_t> &bytes) {
+    std::array<uint64_t, Fp::WIDTH> x_bytes{};
+    std::array<uint64_t, Fp::WIDTH> y_bytes{};
+
+    std::array<uint8_t, sizeof(uint64_t)> temp_bytes{};
+
+    for (int i = 0; i < G1Affine::RAW_SIZE - 1; i += 8) {
+        const int count = i / 8;
+        std::copy(bytes.begin() + i, bytes.begin() + i + 8, temp_bytes.begin());
+        if (count < Fp::WIDTH)
+            x_bytes[count] = from_le_bytes<uint64_t>(temp_bytes);
+        else
+            y_bytes[count - Fp::WIDTH] = from_le_bytes<uint64_t>(temp_bytes);
+    }
+
+    const Fp x = Fp{x_bytes};
+    const Fp y = Fp{y_bytes};
+    bool infinity = false;
+
+    if (bytes.size() >= G1Affine::RAW_SIZE)
+        infinity = static_cast<bool>(bytes[G1Affine::RAW_SIZE - 1]);
+
+    return G1Affine{x, y, infinity};
+}
+
+const Fp &G1Affine::get_x() const noexcept {
     return this->x;
 }
 
-Fp G1Affine::get_y() const noexcept {
+const Fp &G1Affine::get_y() const noexcept {
     return this->y;
 }
 
@@ -144,6 +173,19 @@ bool G1Affine::is_torsion_free() const {
     const G1Projective minus_x_squared_times_p = -G1Projective(*this).mul_by_x().mul_by_x();
     const G1Affine endomorphism_p = this->endomorphism();
     return minus_x_squared_times_p == G1Projective(endomorphism_p);
+}
+
+std::array<uint8_t, G1Affine::RAW_SIZE> G1Affine::to_raw_bytes() const {
+    std::array<uint8_t, G1Affine::RAW_SIZE> bytes{};
+    for (int i = 0; i < Fp::WIDTH; ++i) {
+        const std::array<uint8_t, 8> x_bytes = to_le_bytes<uint64_t>(this->x.get_data()[i]);
+        const std::array<uint8_t, 8> y_bytes = to_le_bytes<uint64_t>(this->y.get_data()[i]);
+
+        std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin() + i * 8);
+        std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + i * 8 + G1Affine::BYTE_SIZE);
+    }
+    bytes[G1Affine::RAW_SIZE - 1] = static_cast<uint8_t>(this->infinity);
+    return bytes;
 }
 
 std::array<uint8_t, G1Affine::BYTE_SIZE> G1Affine::to_compressed() const {

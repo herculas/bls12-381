@@ -41,8 +41,8 @@ public:
     static std::optional<G2Affine> from_uncompressed(const std::array<uint8_t, G2Affine::BYTE_SIZE * 2> &bytes);
     static std::optional<G2Affine> from_uncompressed_unchecked(const std::array<uint8_t, G2Affine::BYTE_SIZE * 2> &bytes);
 
-    [[nodiscard]] field::Fp2 get_x() const noexcept;
-    [[nodiscard]] field::Fp2 get_y() const noexcept;
+    [[nodiscard]] const field::Fp2 &get_x() const noexcept;
+    [[nodiscard]] const field::Fp2 &get_y() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;

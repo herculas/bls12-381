@@ -171,6 +171,10 @@ bool Fp::lexicographically_largest() const {
     return !(static_cast<uint8_t>(borrow) & 1);
 }
 
+const std::array<uint64_t, Fp::WIDTH> &Fp::get_data() const {
+    return this->data;
+}
+
 /// Converts an element of `Fp` into a big-endian byte array.
 std::array<uint8_t, Fp::BYTE_SIZE> Fp::to_bytes() const {
     std::array<uint64_t, Fp::WIDTH * 2> contents{0};

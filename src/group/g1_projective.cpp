@@ -93,15 +93,15 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     return results;
 }
 
-Fp G1Projective::get_x() const noexcept {
+const Fp &G1Projective::get_x() const noexcept {
     return this->x;
 }
 
-Fp G1Projective::get_y() const noexcept {
+const Fp &G1Projective::get_y() const noexcept {
     return this->y;
 }
 
-Fp G1Projective::get_z() const noexcept {
+const Fp &G1Projective::get_z() const noexcept {
     return this->z;
 }
 

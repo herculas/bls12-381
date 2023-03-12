@@ -16,6 +16,7 @@ class G1Affine {
 public:
     static constexpr int32_t WIDTH = field::Fp::WIDTH;
     static constexpr int32_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
+    static constexpr int32_t RAW_SIZE = BYTE_SIZE * 2 + 1;
 
 private:
     field::Fp x;
@@ -40,14 +41,16 @@ public:
     static std::optional<G1Affine> from_compressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE> &bytes);
     static std::optional<G1Affine> from_uncompressed(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
     static std::optional<G1Affine> from_uncompressed_unchecked(const std::array<uint8_t, G1Affine::BYTE_SIZE * 2> &bytes);
+    static G1Affine from_slice_unchecked(const std::vector<uint8_t> &bytes);
 
-    [[nodiscard]] field::Fp get_x() const noexcept;
-    [[nodiscard]] field::Fp get_y() const noexcept;
+    [[nodiscard]] const field::Fp &get_x() const noexcept;
+    [[nodiscard]] const field::Fp &get_y() const noexcept;
 
     [[nodiscard]] bool is_identity() const;
     [[nodiscard]] bool is_on_curve() const;
     [[nodiscard]] bool is_torsion_free() const;
 
+    [[nodiscard]] std::array<uint8_t, G1Affine::RAW_SIZE> to_raw_bytes() const;
     [[nodiscard]] std::array<uint8_t, G1Affine::BYTE_SIZE> to_compressed() const;
     [[nodiscard]] std::array<uint8_t, G1Affine::BYTE_SIZE * 2> to_uncompressed() const;
 

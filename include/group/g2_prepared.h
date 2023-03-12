@@ -21,7 +21,7 @@ public:
     explicit G2Prepared(G2Affine &&point);
 
     [[nodiscard]] bool is_identity() const;
-    [[nodiscard]] std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> get_coeffs() const;
+    [[nodiscard]] const std::vector<std::tuple<field::Fp2, field::Fp2, field::Fp2>> &get_coeffs() const;
 };
 
 } // namespace bls12_381::group

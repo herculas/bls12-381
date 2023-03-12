@@ -144,11 +144,11 @@ G2Affine::from_uncompressed_unchecked(const std::array<uint8_t, G2Affine::BYTE_S
     }
 }
 
-Fp2 G2Affine::get_x() const noexcept {
+const Fp2 &G2Affine::get_x() const noexcept {
     return this->x;
 }
 
-Fp2 G2Affine::get_y() const noexcept {
+const Fp2 &G2Affine::get_y() const noexcept {
     return this->y;
 }
 
