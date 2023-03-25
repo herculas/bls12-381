@@ -115,7 +115,7 @@ bool Scalar::is_zero() const {
            && this->data[3] == 0;
 }
 
-std::string Scalar::get_hex() const {
+std::string Scalar::get_hex_str() const {
     std::array<uint8_t, Scalar::BYTE_SIZE> bytes = this->to_bytes();
     std::reverse(bytes.begin(), bytes.end());
 

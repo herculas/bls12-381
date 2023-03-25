@@ -3,8 +3,12 @@
 #include "field/constant.h"
 #include "group/g2_projective.h"
 #include "scalar/scalar.h"
+#include "utils/bit.h"
 
 namespace bls12_381::group {
+
+using rng::util::bit::to_le_bytes;
+using rng::util::bit::from_le_bytes;
 
 using field::Fp;
 using field::Fp2;
@@ -225,6 +229,54 @@ G2Projective operator-(const G2Affine &a, const G2Projective &b) {
 
 G2Projective operator*(const G2Affine &a, const Scalar &b) {
     return G2Projective(a) *= b;
+}
+
+auto G2Affine::from_slice_unchecked(const std::vector<uint8_t> &bytes) -> G2Affine {
+    std::array<uint64_t, Fp::WIDTH> x0_bytes{};
+    std::array<uint64_t, Fp::WIDTH> x1_bytes{};
+    std::array<uint64_t, Fp::WIDTH> y0_bytes{};
+    std::array<uint64_t, Fp::WIDTH> y1_bytes{};
+
+    std::array<uint8_t, sizeof(uint64_t)> temp_bytes{};
+
+for (int i = 0; i < G2Affine::RAW_SIZE - 1; i += 8) {
+        const int count = i / 8;
+        std::copy(bytes.begin() + i, bytes.begin() + i + 8, temp_bytes.begin());
+        if (count < Fp::WIDTH)
+            x0_bytes[count] = from_le_bytes<uint64_t>(temp_bytes);
+        else if (count < Fp::WIDTH * 2)
+            x1_bytes[count - Fp::WIDTH] = from_le_bytes<uint64_t>(temp_bytes);
+        else if (count < Fp::WIDTH * 3)
+            y0_bytes[count - Fp::WIDTH * 2] = from_le_bytes<uint64_t>(temp_bytes);
+        else
+            y1_bytes[count - Fp::WIDTH * 3] = from_le_bytes<uint64_t>(temp_bytes);
+    }
+
+    const Fp2 x = Fp2{Fp{x0_bytes}, Fp{x1_bytes}};
+    const Fp2 y = Fp2{Fp{y0_bytes}, Fp{y1_bytes}};
+    bool infinity = false;
+
+    if (bytes.size() >= G2Affine::RAW_SIZE)
+        infinity = static_cast<bool>(bytes[G2Affine::RAW_SIZE - 1]);
+
+    return G2Affine{x, y, infinity};
+}
+
+std::array<uint8_t, G2Affine::RAW_SIZE> G2Affine::to_raw_bytes() const {
+    std::array<uint8_t, G2Affine::RAW_SIZE> bytes{};
+    for (int i = 0; i < Fp::WIDTH; ++i) {
+        const std::array<uint8_t, 8> x0_bytes = to_le_bytes<uint64_t>(this->x.get_c0().get_data()[i]);
+        const std::array<uint8_t, 8> x1_bytes = to_le_bytes<uint64_t>(this->x.get_c1().get_data()[i]);
+        const std::array<uint8_t, 8> y0_bytes = to_le_bytes<uint64_t>(this->y.get_c0().get_data()[i]);
+        const std::array<uint8_t, 8> y1_bytes = to_le_bytes<uint64_t>(this->y.get_c1().get_data()[i]);
+
+        std::copy(x0_bytes.begin(), x0_bytes.end(), bytes.begin() + i * 8);
+        std::copy(x1_bytes.begin(), x1_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE);
+        std::copy(y0_bytes.begin(), y0_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE * 2);
+        std::copy(y1_bytes.begin(), y1_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE * 3);
+    }
+    bytes[G2Affine::RAW_SIZE - 1] = static_cast<uint8_t>(this->infinity);
+    return bytes;
 }
 
 } // namespace bls12_381::group

@@ -624,3 +624,27 @@ TEST(TestG2, CommutativeScalarSubgroupMul) {
     EXPECT_EQ(g1_a * a, a * g1_p);
     EXPECT_EQ(g1_p * a, a * g1_a);
 }
+
+TEST(G2, AffineBytesUnchecked) {
+    const G2Affine gen = G2Affine::generator();
+    const G2Affine id = G2Affine::identity();
+
+    const std::array<uint8_t, G2Affine::RAW_SIZE> gen_bytes_array = gen.to_raw_bytes();
+
+    std::vector<uint8_t> gen_bytes_vec{};
+    gen_bytes_vec.reserve(G2Affine::RAW_SIZE);
+    gen_bytes_vec.insert(gen_bytes_vec.end(), gen_bytes_array.begin(), gen_bytes_array.end());
+
+    const G2Affine gen_recovered = G2Affine::from_slice_unchecked(gen_bytes_vec);
+
+    const std::array<uint8_t, G2Affine::RAW_SIZE> id_bytes_array = id.to_raw_bytes();
+
+    std::vector<uint8_t> id_bytes_vec{};
+    id_bytes_vec.reserve(G2Affine::RAW_SIZE);
+    id_bytes_vec.insert(id_bytes_vec.end(), id_bytes_array.begin(), id_bytes_array.end());
+
+    const G2Affine id_recovered = G2Affine::from_slice_unchecked(id_bytes_vec);
+
+    EXPECT_EQ(gen, gen_recovered);
+    EXPECT_EQ(id, id_recovered);
+}

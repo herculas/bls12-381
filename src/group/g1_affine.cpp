@@ -8,9 +8,10 @@
 
 namespace bls12_381::group {
 
-using field::Fp;
 using rng::util::bit::from_le_bytes;
 using rng::util::bit::to_le_bytes;
+
+using field::Fp;
 
 G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}
 
@@ -182,7 +183,7 @@ std::array<uint8_t, G1Affine::RAW_SIZE> G1Affine::to_raw_bytes() const {
         const std::array<uint8_t, 8> y_bytes = to_le_bytes<uint64_t>(this->y.get_data()[i]);
 
         std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin() + i * 8);
-        std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + i * 8 + G1Affine::BYTE_SIZE);
+        std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE);
     }
     bytes[G1Affine::RAW_SIZE - 1] = static_cast<uint8_t>(this->infinity);
     return bytes;

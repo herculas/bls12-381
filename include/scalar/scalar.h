@@ -43,7 +43,7 @@ public:
     static std::optional<Scalar> from_bytes(const std::array<uint8_t, Scalar::BYTE_SIZE> &bytes);
 
     [[nodiscard]] bool is_zero() const;
-    [[nodiscard]] std::string get_hex() const;
+    [[nodiscard]] std::string get_hex_str() const;
     [[nodiscard]] std::array<uint8_t, Scalar::BYTE_SIZE> to_bytes() const;
 
     [[nodiscard]] Scalar doubles() const;

@@ -6,16 +6,26 @@
 
 namespace bls12_381::field::constant {
 
-/// The modulus of the finite field.
+/**
+ * @brief The <tt>MODULUS</tt> is represented as a little-endian array of 64-bit unsigned integers.
+ * @details The value is:
+ *          0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab.
+ */
 const uint64_t MODULUS[Fp::WIDTH] = {
         0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
         0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a,
 };
 
-/// INV = -(p ^ {-1} mod 2 ^ 64) mod 2 ^ 64.
+/**
+ * @brief <tt>INV</tt> is the negative inverse of the modulus mod 2 ^ 64. It is used to speed up the reduction modulo p.
+ * @details The value is: -(MODULUS ^ {-1} mod 2 ^ 64) mod 2 ^ 64.
+ */
 const uint64_t INV = 0x89f3fffcfffcfffd;
 
-/// R1 = 2 ^ 384 mod p.
+/**
+ * @brief R1 is the Montgomery factor.
+ * @details The value is: 2 ^ 384 mod p.
+ */
 const Fp R1(
         {
                 0x760900000002fffd, 0xebf4000bc40c0002, 0x5f48985753c758ba,
@@ -23,7 +33,10 @@ const Fp R1(
         }
 );
 
-/// R2 = 2 ^ (384 * 2) mod p.
+/**
+ * @brief R2 is the Montgomery factor.
+ * @details The value is: 2 ^ (384 * 2) mod p.
+ */
 const Fp R2(
         {
                 0xf4df1f341c341746, 0x0a76e6a609d104f1, 0x8de5476c4c95b6d5,
@@ -31,7 +44,10 @@ const Fp R2(
         }
 );
 
-/// R3 = 2 ^ (384 * 3) mod p.
+/**
+ * @brief R3 is the Montgomery factor.
+ * @details The value is: 2 ^ (384 * 3) mod p.
+ */
 const Fp R3(
         {
                 0xed48ac6bd94ca1e0, 0x315f831e03a7adf8, 0x9a53352a615e29dd,
@@ -76,7 +92,10 @@ const Fp2 B3{
         ),
 };
 
-/// A non-trivial third root of unity in Fp.
+/**
+ * @brief A non-trivial third root of unity in <tt>Fp</tt>.
+ * @details The value is 2 ^ 128 mod p.
+ */
 const Fp BETA(
         {
                 0x30f1361b798a64e8, 0xf3b8ddab7ece5a2a, 0x16a8ca3ac61577f7,

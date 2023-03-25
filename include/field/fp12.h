@@ -11,6 +11,10 @@
 
 namespace bls12_381::field {
 
+/**
+ * @brief Represents an element of the field Fp12.
+ * @details This represents an element c0 + c1 * w of Fp12 = Fp6 / (w^2 - v), where w is the cubic non-residue.
+ */
 class Fp12 {
 private:
     Fp6 c0;
@@ -31,7 +35,16 @@ public:
     explicit Fp12(Fp6 &&fp);
     explicit Fp12(Fp6 &&fp0, Fp6 &&fp1);
 
+    /**
+     * @brief Returns zero, the additive identity.
+     * @return The additive identity.
+     */
     static Fp12 zero() noexcept;
+
+    /**
+     * @brief Returns one, the multiplicative identity.
+     * @return The multiplicative identity.
+     */
     static Fp12 one() noexcept;
     static Fp12 random(rng::core::RngCore &rng);
 
@@ -45,7 +58,11 @@ public:
     [[nodiscard]] Fp12 frobenius_map() const;
     [[nodiscard]] Fp12 mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp4) const;
 
-    [[nodiscard]] std::optional<Fp12> invert() const;
+    /**
+     * @brief Computes the multiplicative inverse of this <tt>Fp12</tt> element.
+     * @return The multiplicative inverse of this element, if exists.
+     */
+    [[nodiscard]] auto invert() const -> std::optional<Fp12>;
 
 public:
     Fp12 operator-() const;
