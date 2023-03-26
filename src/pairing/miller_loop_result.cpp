@@ -125,8 +125,8 @@ MillerLoopResult &MillerLoopResult::operator+=(const MillerLoopResult &rhs) {
     return *this;
 }
 
-Fp12 MillerLoopResult::get_data() const {
-    return this->data;
+const Fp12 &MillerLoopResult::get_data() const {
+    return data;
 }
 
 } // namespace bls12_381::pairing

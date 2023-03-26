@@ -12,7 +12,8 @@ namespace bls12_381::field {
 
 /**
  * @brief Represents an element of the field Fp6.
- * @details This represents an element c0 + c1 * v + c2 * v^2 of Fp6 = Fp2 / (v^3 - u - 1), where v is the quadratic non-residue.
+ * @details This represents an element c0 + c1 * v + c2 * v^2 of Fp6 = Fp2 / (v^3 - u - 1), where v is the quadratic
+ *          non-residue.
  */
 class Fp6 {
 private:

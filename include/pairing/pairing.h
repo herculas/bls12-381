@@ -11,6 +11,12 @@
 
 namespace bls12_381::pairing {
 
+/**
+ * @brief A generic implementation of the Miller loop.
+ * @tparam T The type of the result of the Miller loop.
+ * @param driver The driver of the Miller loop.
+ * @return The result of the Miller loop of type <tt>T</tt>.
+ */
 template<typename T>
 T miller_loop(MillerLoopDriver<T> &driver) {
     T f = driver.one();
@@ -34,11 +40,21 @@ T miller_loop(MillerLoopDriver<T> &driver) {
 template<>
 void miller_loop(MillerLoopDriver<void> &driver);
 
+/**
+ * @brief Computes the sum of miller_loop(a_i, b_i) given a series of terms (a_1, b_1), ..., (a_n, b_n).
+ * @param terms A series of terms (a_i, b_i) where a's are <tt>G1Affine</tt> elements and b's are <tt>G2Prepared</tt>
+ *          elements.
+ * @return The result of the multiple Miller loop.
+ */
 MillerLoopResult multi_miller_loop(const std::vector<std::tuple<group::G1Affine, group::G2Prepared>> &terms);
+
+/**
+ * @brief Invokes the pairing function without the use of pre-computation and other optimizations.
+ * @param p A <tt>G1Affine</tt> element.
+ * @param q A <tt>G2Affine</tt> element.
+ * @return The result of the pairing function, a <tt>Gt</tt> element.
+ */
 group::Gt pairings(const group::G1Affine &p, const group::G2Affine &q);
-field::Fp12 ell(const field::Fp12 &f,
-                const std::tuple<field::Fp2, field::Fp2, field::Fp2> &coefficients,
-                const group::G1Affine &p);
 
 } // namespace bls12_381::pairing
 

@@ -58,7 +58,8 @@ public:
     static G2Affine generator() noexcept;
 
     /**
-     * @brief Attempts to convert a set of bytes created by <tt>G2Affine::to_raw_bytes</tt> into an element of <tt>G1Affine</tt>.
+     * @brief Attempts to convert a set of bytes created by <tt>G2Affine::to_raw_bytes</tt> into an element of
+     *          <tt>G1Affine</tt>.
      * @param bytes The byte vector in big-endian order of size 193 bytes.
      * @return The <tt>G2Affine</tt> value, if exists.
      * @note No check is performed and no constant time is guaranteed. The expected usage of this function is for

@@ -14,7 +14,7 @@ namespace bls12_381::field {
 /**
  * @brief Represents an element of the field Fp.
  * @details The internal representation is six 64-bit unsigned integers in little-endian order. <tt>Fp</tt> values are
- *          always in Montgomery form, i.e., Fp(x) = xR mod p, where R = 2 ^ 384.
+ *          always in Montgomery form, i.e., Fp(x) = x * R mod p, where R = 2 ^ 384.
  */
 class Fp {
 public:

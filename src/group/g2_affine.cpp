@@ -1,9 +1,10 @@
 #include "group/g2_affine.h"
 
+#include "utils/bit.h"
+
 #include "field/constant.h"
 #include "group/g2_projective.h"
 #include "scalar/scalar.h"
-#include "utils/bit.h"
 
 namespace bls12_381::group {
 

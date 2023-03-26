@@ -2,6 +2,7 @@
 
 #include "group/g2_affine.h"
 #include "group/g2_projective.h"
+#include "group/g2_prepared.h"
 #include "group/constant.h"
 #include "scalar/scalar.h"
 
@@ -9,6 +10,7 @@ using bls12_381::field::Fp;
 using bls12_381::field::Fp2;
 using bls12_381::group::G2Affine;
 using bls12_381::group::G2Projective;
+using bls12_381::group::G2Prepared;
 using bls12_381::scalar::Scalar;
 
 TEST(TestG2, OnCurve) {
@@ -647,4 +649,12 @@ TEST(G2, AffineBytesUnchecked) {
 
     EXPECT_EQ(gen, gen_recovered);
     EXPECT_EQ(id, id_recovered);
+}
+
+TEST(G2, PreparedSerialization) {
+    const G2Prepared g2_prepared{G2Affine::generator()};
+    const auto bytes = g2_prepared.to_raw_bytes();
+    const auto g2_prepared_recovered = G2Prepared::from_slice_unchecked(bytes);
+    const auto bytes_2 = g2_prepared_recovered.to_raw_bytes();
+    EXPECT_EQ(bytes, bytes_2);
 }
