@@ -1,6 +1,8 @@
 #ifndef BLS12_381_FIELD_CONSTANT_H
 #define BLS12_381_FIELD_CONSTANT_H
 
+#include <array>
+
 #include "field/fp.h"
 #include "field/fp2.h"
 

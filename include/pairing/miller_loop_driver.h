@@ -18,6 +18,12 @@ struct MillerLoopDriver {
     virtual T square_output(T &f) = 0;
     virtual T conjugate(T &f) = 0;
     virtual T one() = 0;
+
+    MillerLoopDriver() = default;
+    MillerLoopDriver(MillerLoopDriver &&) noexcept = default;
+    MillerLoopDriver(MillerLoopDriver const &) noexcept = default;
+    MillerLoopDriver &operator=(MillerLoopDriver &&) noexcept = default;
+    MillerLoopDriver &operator=(MillerLoopDriver const &) noexcept = default;
     virtual ~MillerLoopDriver() = default;
 };
 
@@ -28,6 +34,12 @@ struct MillerLoopDriver<void> {
     virtual void square_output() = 0;
     virtual void conjugate() = 0;
     virtual void one() = 0;
+
+    MillerLoopDriver() = default;
+    MillerLoopDriver(MillerLoopDriver &&) noexcept = default;
+    MillerLoopDriver(MillerLoopDriver const &) noexcept = default;
+    MillerLoopDriver &operator=(MillerLoopDriver &&) noexcept = default;
+    MillerLoopDriver &operator=(MillerLoopDriver const &) noexcept = default;
     virtual ~MillerLoopDriver() = default;
 };
 

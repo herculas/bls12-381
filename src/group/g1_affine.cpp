@@ -17,13 +17,14 @@ G1Affine::G1Affine() : x{Fp::zero()}, y{Fp::one()}, infinity{true} {}
 
 G1Affine::G1Affine(const G1Affine &point) = default;
 
-G1Affine::G1Affine(const Fp &x, const Fp &y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
+G1Affine::G1Affine(const Fp &x, const Fp &y, bool infinity) // NOLINT(bugprone-easily-swappable-parameters)
+        : x{x}, y{y}, infinity{infinity} {}
 
 G1Affine::G1Affine(const G1Projective &point) : x{Fp::zero()}, y{Fp::one()}, infinity{true} {
     const Fp z_inv = point.get_z().invert().value_or(Fp::zero());
     const Fp rx = point.get_x() * z_inv;
     const Fp ry = point.get_y() * z_inv;
-    G1Affine temp{rx, ry, false};
+    G1Affine const temp{rx, ry, false};
     if (!z_inv.is_zero()) *this = temp;
 }
 
@@ -33,11 +34,13 @@ G1Affine::G1Affine(G1Projective &&point) : x{Fp::zero()}, y{Fp::one()}, infinity
     const Fp z_inv = point.get_z().invert().value_or(Fp::zero());
     const Fp rx = point.get_x() * z_inv;
     const Fp ry = point.get_y() * z_inv;
-    G1Affine temp{rx, ry, false};
+    G1Affine const temp{rx, ry, false};
     if (!z_inv.is_zero()) *this = temp;
 }
 
 G1Affine::G1Affine(Fp &&x, Fp &&y, bool infinity) : x{std::move(x)}, y{std::move(y)}, infinity{infinity} {}
+
+G1Affine::~G1Affine() = default;
 
 G1Affine G1Affine::identity() noexcept {
     return G1Affine{};
@@ -182,8 +185,8 @@ std::array<uint8_t, G1Affine::RAW_SIZE> G1Affine::to_raw_bytes() const {
         const std::array<uint8_t, 8> x_bytes = to_le_bytes<uint64_t>(this->x.get_data()[i]);
         const std::array<uint8_t, 8> y_bytes = to_le_bytes<uint64_t>(this->y.get_data()[i]);
 
-        std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin() + i * 8);
-        std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE);
+        std::copy(x_bytes.begin(), x_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8));
+        std::copy(y_bytes.begin(), y_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8) + Fp::BYTE_SIZE);
     }
     bytes[G1Affine::RAW_SIZE - 1] = static_cast<uint8_t>(this->infinity);
     return bytes;

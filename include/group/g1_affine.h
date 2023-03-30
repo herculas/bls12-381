@@ -21,9 +21,9 @@ namespace bls12_381::group {
  */
 class G1Affine {
 public:
-    static constexpr int32_t WIDTH = field::Fp::WIDTH;
-    static constexpr int32_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
-    static constexpr int32_t RAW_SIZE = BYTE_SIZE * 2 + 1;
+    static constexpr size_t WIDTH = field::Fp::WIDTH;
+    static constexpr size_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
+    static constexpr size_t RAW_SIZE = BYTE_SIZE * 2 + 1;
 
 private:
     field::Fp x;
@@ -40,6 +40,8 @@ public:
     G1Affine(G1Affine &&point) noexcept;
     explicit G1Affine(G1Projective &&point);
     explicit G1Affine(field::Fp &&x, field::Fp &&y, bool infinity);
+
+    ~G1Affine();
 
     /**
      * @brief Returns the identity element of G1 in affine coordinate form.

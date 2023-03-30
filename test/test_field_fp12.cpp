@@ -208,9 +208,9 @@ TEST(TestFp12, Arithmetic) {
             },
     };
 
-    a = a.square().invert().value().square() + c;
-    b = b.square().invert().value().square() + a;
-    c = c.square().invert().value().square() + b;
+    a = a.square().invert().value().square() + c; // NOLINT(bugprone-unchecked-optional-access)
+    b = b.square().invert().value().square() + a; // NOLINT(bugprone-unchecked-optional-access)
+    c = c.square().invert().value().square() + b; // NOLINT(bugprone-unchecked-optional-access)
 
     EXPECT_EQ(a.square(), a * a);
     EXPECT_EQ(b.square(), b * b);
@@ -218,7 +218,8 @@ TEST(TestFp12, Arithmetic) {
 
     EXPECT_EQ((a + b) * c.square(), (c * c * a) + (c * c * b));
 
-    EXPECT_EQ(a.invert().value() * b.invert().value(), (a * b).invert().value());
+    EXPECT_EQ(a.invert().value() * b.invert().value(), // NOLINT(bugprone-unchecked-optional-access)
+              (a * b).invert().value()); // NOLINT(bugprone-unchecked-optional-access)
 
     EXPECT_TRUE(a != a.frobenius_map());
     EXPECT_EQ(

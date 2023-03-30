@@ -21,7 +21,7 @@ template<>
 void miller_loop(MillerLoopDriver<void> &driver) {
     bool found_one = false;
     for (int i = 63; i >= 0; --i) {
-        bool bit = (((group::constant::BLS_X >> 1) >> i) & 1) == 1;
+        bool const bit = (((group::constant::BLS_X >> 1) >> i) & 1) == 1;
         if (!found_one) {
             found_one = bit;
             continue;
@@ -35,26 +35,27 @@ void miller_loop(MillerLoopDriver<void> &driver) {
 }
 
 Fp12 ell(const Fp12 &f, const coeff_t &coefficients, const G1Affine &p) {
-    Fp c00 = std::get<0>(coefficients).get_c0() * p.get_y();
-    Fp c01 = std::get<0>(coefficients).get_c1() * p.get_y();
-    Fp c10 = std::get<1>(coefficients).get_c0() * p.get_x();
-    Fp c11 = std::get<1>(coefficients).get_c1() * p.get_x();
+    Fp const c00 = std::get<0>(coefficients).get_c0() * p.get_y();
+    Fp const c01 = std::get<0>(coefficients).get_c1() * p.get_y();
+    Fp const c10 = std::get<1>(coefficients).get_c0() * p.get_x();
+    Fp const c11 = std::get<1>(coefficients).get_c1() * p.get_x();
 
     return f.mul_by_fp2(std::get<2>(coefficients), Fp2{c10, c11}, Fp2{c00, c01});
 }
 
 struct HelperMulti : MillerLoopDriver<Fp12> {
+private:
     std::vector<std::tuple<G1Affine, G2Prepared>> terms;
     size_t index;
-
+public:
     HelperMulti(const std::vector<std::tuple<G1Affine, G2Prepared>> &terms, size_t index) : terms{terms},
                                                                                             index{index} {}
 
     Fp12 doubling_step(Fp12 &f) override {
-        size_t idx = this->index;
+        size_t const idx = this->index;
         for (auto term: this->terms) {
-            bool either_identity = std::get<0>(term).is_identity() | std::get<1>(term).is_identity();
-            Fp12 new_f = ell(f, std::get<1>(term).get_coeffs()[idx], std::get<0>(term));
+            bool const either_identity = std::get<0>(term).is_identity() | std::get<1>(term).is_identity();
+            Fp12 const new_f = ell(f, std::get<1>(term).get_coeffs()[idx], std::get<0>(term));
             f = either_identity ? f : new_f;
         }
         this->index += 1;
@@ -62,10 +63,10 @@ struct HelperMulti : MillerLoopDriver<Fp12> {
     }
 
     Fp12 addition_step(Fp12 &f) override {
-        size_t idx = this->index;
+        size_t const idx = this->index;
         for (auto term: this->terms) {
-            bool either_identity = std::get<0>(term).is_identity() | std::get<1>(term).is_identity();
-            Fp12 new_f = ell(f, std::get<1>(term).get_coeffs()[idx], std::get<0>(term));
+            bool const either_identity = std::get<0>(term).is_identity() | std::get<1>(term).is_identity();
+            Fp12 const new_f = ell(f, std::get<1>(term).get_coeffs()[idx], std::get<0>(term));
             f = either_identity ? f : new_f;
         }
         this->index += 1;
@@ -87,15 +88,16 @@ struct HelperMulti : MillerLoopDriver<Fp12> {
 
 MillerLoopResult multi_miller_loop(const std::vector<std::tuple<G1Affine, G2Prepared>> &terms) {
     HelperMulti helper{terms, 0};
-    Fp12 temp = miller_loop(helper);
+    Fp12 const temp = miller_loop(helper);
     return MillerLoopResult{temp};
 }
 
 struct HelperPairing : MillerLoopDriver<Fp12> {
+private:
     G2Projective current;
     G2Affine base;
     G1Affine p;
-
+public:
     HelperPairing(G2Projective current, G2Affine base, G1Affine p)
             : current{std::move(current)}, base{std::move(base)}, p{std::move(p)} {}
 
@@ -123,12 +125,12 @@ struct HelperPairing : MillerLoopDriver<Fp12> {
 };
 
 Gt pairings(const G1Affine &p, const G2Affine &q) {
-    bool either_identity = p.is_identity() | q.is_identity();
-    G1Affine temp_p = either_identity ? G1Affine::generator() : p;
-    G2Affine temp_q = either_identity ? G2Affine::generator() : q;
+    bool const either_identity = p.is_identity() | q.is_identity();
+    G1Affine const temp_p = either_identity ? G1Affine::generator() : p;
+    G2Affine const temp_q = either_identity ? G2Affine::generator() : q;
 
     HelperPairing helper{G2Projective{temp_q}, temp_q, temp_p};
-    Fp12 temp = miller_loop(helper);
+    Fp12 const temp = miller_loop(helper);
     MillerLoopResult temp2{either_identity ? Fp12::one() : temp};
     return temp2.final_exponentiation();
 }

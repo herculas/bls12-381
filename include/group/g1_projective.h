@@ -34,6 +34,8 @@ public:
     explicit G1Projective(G1Affine &&point);
     explicit G1Projective(field::Fp &&x, field::Fp &&y, field::Fp &&z);
 
+    ~G1Projective();
+
     /**
      * @brief Returns the identity element of G1 in projective coordinate form.
      * @return The identity element of G1.
@@ -133,13 +135,13 @@ public:
 
 public:
     friend inline bool operator==(const G1Projective &a, const G1Projective &b) {
-        field::Fp x1 = a.x * b.z;
-        field::Fp x2 = b.x * a.z;
-        field::Fp y1 = a.y * b.z;
-        field::Fp y2 = b.y * a.z;
+        field::Fp const x1 = a.x * b.z;
+        field::Fp const x2 = b.x * a.z;
+        field::Fp const y1 = a.y * b.z;
+        field::Fp const y2 = b.y * a.z;
 
-        bool a_is_zero = a.z.is_zero();
-        bool b_is_zero = b.z.is_zero();
+        bool const a_is_zero = a.z.is_zero();
+        bool const b_is_zero = b.z.is_zero();
 
         return (a_is_zero & b_is_zero) | ((!a_is_zero) & (!b_is_zero) & (x1 == x2) & (y1 == y2));
     }

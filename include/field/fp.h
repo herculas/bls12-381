@@ -18,21 +18,23 @@ namespace bls12_381::field {
  */
 class Fp {
 public:
-    static constexpr int32_t WIDTH = 6;
-    static constexpr int32_t BYTE_SIZE = Fp::WIDTH * sizeof(uint64_t);
+    static constexpr size_t WIDTH = 6;
+    static constexpr size_t BYTE_SIZE = Fp::WIDTH * sizeof(uint64_t);
 
 private:
     std::array<uint64_t, Fp::WIDTH> data;
 
 public:
-    Fp();
+    Fp() noexcept;
 
-    Fp(const Fp &fp);
-    explicit Fp(uint64_t val);
-    explicit Fp(const std::array<uint64_t, Fp::WIDTH> &data);
+    Fp(const Fp &fp) noexcept;
+    explicit Fp(uint64_t val) noexcept;
+    explicit Fp(const std::array<uint64_t, Fp::WIDTH> &data) noexcept;
 
     Fp(Fp &&fp) noexcept;
-    explicit Fp(std::array<uint64_t, Fp::WIDTH> &&data);
+    explicit Fp(std::array<uint64_t, Fp::WIDTH> &&data) noexcept;
+
+    ~Fp() noexcept;
 
     /**
      * @brief Returns zero, the additive identity.

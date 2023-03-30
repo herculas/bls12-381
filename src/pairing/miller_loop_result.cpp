@@ -20,14 +20,14 @@ MillerLoopResult::MillerLoopResult(const Fp12 &data) : data{data} {}
 MillerLoopResult::MillerLoopResult(Fp12 &&data) : data{data} {}
 
 std::tuple<Fp2, Fp2> fp4_square(const Fp2 &a, const Fp2 &b) {
-    Fp2 t0 = a.square();
-    Fp2 t1 = b.square();
+    Fp2 const t0 = a.square();
+    Fp2 const t1 = b.square();
     Fp2 t2 = t1.mul_by_non_residue();
-    Fp2 c0 = t2 + t0;
+    Fp2 const c0 = t2 + t0;
     t2 = a + b;
     t2 = t2.square();
     t2 -= t0;
-    Fp2 c1 = t2 - t1;
+    Fp2 const c1 = t2 - t1;
     return {c0, c1};
 }
 
@@ -70,11 +70,11 @@ Fp12 cyclotomic_square(const Fp12 &point) {
 }
 
 Fp12 cyclotomic_exp(const Fp12 &point) {
-    uint64_t x = group::constant::BLS_X;
+    uint64_t const x = group::constant::BLS_X;
     Fp12 temp = Fp12::one();
     bool found_one = false;
-    for (int i = 63; i >= 0; --i) {
-        bool bit = ((x >> i) & 1) == 1;
+    for (int i = 63; i >= 0; --i) { // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        bool const bit = ((x >> i) & 1) == 1;
         if (found_one) temp = cyclotomic_square(temp);
         else found_one = bit;
         if (bit) temp *= point;
@@ -89,8 +89,7 @@ Gt MillerLoopResult::final_exponentiation() {
             .frobenius_map().frobenius_map().frobenius_map();
 
     assert(f.invert().has_value());
-
-    Fp12 t1 = f.invert().value();
+    Fp12 t1 = f.invert().value(); // NOLINT(bugprone-unchecked-optional-access)
     Fp12 t2 = t0 * t1;
     t1 = t2;
     t2 = t2.frobenius_map().frobenius_map();

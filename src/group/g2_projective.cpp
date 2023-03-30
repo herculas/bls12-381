@@ -22,7 +22,8 @@ G2Projective::G2Projective(const G2Projective &point) = default;
 G2Projective::G2Projective(const G2Affine &point)
         : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? Fp2::zero() : Fp2::one()} {}
 
-G2Projective::G2Projective(const Fp2 &x, const Fp2 &y, const Fp2 &z) : x{x}, y{y}, z{z} {}
+G2Projective::G2Projective(const Fp2 &x, const Fp2 &y, const Fp2 &z)  // NOLINT(bugprone-easily-swappable-parameters)
+        : x{x}, y{y}, z{z} {}
 
 G2Projective::G2Projective(G2Projective &&point) noexcept = default;
 
@@ -31,6 +32,8 @@ G2Projective::G2Projective(G2Affine &&point)
 
 G2Projective::G2Projective(Fp2 &&x, Fp2 &&y, Fp2 &&z)
         : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
+
+G2Projective::~G2Projective() = default;
 
 G2Projective G2Projective::identity() noexcept {
     return G2Projective{};
@@ -90,9 +93,9 @@ std::vector<G2Affine> G2Projective::batch_normalize(const std::vector<G2Projecti
     acc = acc.invert().value();
 
     for (int i = static_cast<int32_t>(points.size()) - 1; i >= 0; --i) {
-        Fp2 temp = temp_xs[i] * acc;
+        Fp2 const temp = temp_xs[i] * acc;
         acc = points[i].is_identity() ? acc : (acc * points[i].z);
-        G2Affine r{points[i].x * temp, points[i].y * temp, false};
+        G2Affine const r{points[i].x * temp, points[i].y * temp, false};
         results[i] = points[i].is_identity() ? G2Affine::identity() : r;
     }
 
@@ -145,7 +148,7 @@ G2Projective G2Projective::doubles() const {
     x3 = t0 * t1;
     x3 = x3 + x3;
 
-    G2Projective temp{x3, y3, z3};
+    G2Projective const temp{x3, y3, z3};
     return this->is_identity() ? G2Projective::identity() : temp;
 }
 
@@ -215,7 +218,7 @@ G2Projective G2Projective::add_mixed(const G2Affine &rhs) const {
     z3 = z3 * t4;
     z3 = z3 + t0;
 
-    G2Projective temp{x3, y3, z3};
+    G2Projective const temp{x3, y3, z3};
     return rhs.is_identity() ? *this : temp;
 }
 
@@ -234,13 +237,13 @@ G2Projective G2Projective::mul_by_x() const {
 }
 
 G2Projective G2Projective::clear_cofactor() const {
-    G2Projective t1 = this->mul_by_x();
-    G2Projective t2 = this->psi();
+    G2Projective const t1 = this->mul_by_x();
+    G2Projective const t2 = this->psi();
     return this->doubles().psi2() + (t1 + t2).mul_by_x() - t1 - t2 - *this;
 }
 
 G2Projective G2Projective::psi() const {
-    Fp2 psi_coeff_x{
+    Fp2 const psi_coeff_x{
             Fp::zero(),
             Fp(
                     {
@@ -249,7 +252,7 @@ G2Projective G2Projective::psi() const {
                     }
             )
     };
-    Fp2 psi_coeff_y{
+    Fp2 const psi_coeff_y{
             Fp(
                     {
                             0x3e2f585da55c9ad1, 0x4294213d86c18183, 0x382844c88b623732,
@@ -271,7 +274,7 @@ G2Projective G2Projective::psi() const {
 }
 
 G2Projective G2Projective::psi2() const {
-    Fp2 psi2_coeff_x{
+    Fp2 const psi2_coeff_x{
             Fp(
                     {
                             0xcd03c9e48671f071, 0x5dab22461fcda5d2, 0x587042afd3851b95,
@@ -292,7 +295,7 @@ G2Projective G2Projective::multiply(const std::array<uint8_t, 32> &bytes) const 
     for (auto iter = bytes.rbegin(); iter != bytes.rend(); ++iter) {
         for (int i = 7; i >= 0; --i) {
             if (iter == bytes.rbegin() && i == 7) continue;
-            uint8_t bit = (*iter >> i) & static_cast<uint8_t>(1);
+            uint8_t const bit = (*iter >> i) & static_cast<uint8_t>(1);
             acc = acc.doubles();
             if (bit != 0) acc = acc + *this;
         }

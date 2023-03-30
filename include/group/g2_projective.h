@@ -34,6 +34,8 @@ public:
     explicit G2Projective(G2Affine &&point);
     explicit G2Projective(field::Fp2 &&x, field::Fp2 &&y, field::Fp2 &&z);
 
+    ~G2Projective();
+
     /**
      * @brief Returns the identity element of G2 in projective coordinate form.
      * @return The identity element of G2.
@@ -139,13 +141,13 @@ public:
     friend inline G2Projective operator*(const G2Projective &a, const scalar::Scalar &b) { return G2Projective(a) *= b; }
 
     friend inline bool operator==(const G2Projective &a, const G2Projective &b) {
-        field::Fp2 x1 = a.x * b.z;
-        field::Fp2 x2 = b.x * a.z;
-        field::Fp2 y1 = a.y * b.z;
-        field::Fp2 y2 = b.y * a.z;
+        field::Fp2 const x1 = a.x * b.z;
+        field::Fp2 const x2 = b.x * a.z;
+        field::Fp2 const y1 = a.y * b.z;
+        field::Fp2 const y2 = b.y * a.z;
 
-        bool a_is_zero = a.z.is_zero();
-        bool b_is_zero = b.z.is_zero();
+        bool const a_is_zero = a.z.is_zero();
+        bool const b_is_zero = b.z.is_zero();
 
         return (a_is_zero & b_is_zero) | ((!a_is_zero) & (!b_is_zero) & (x1 == x2) & (y1 == y2));
     }

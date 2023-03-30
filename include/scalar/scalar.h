@@ -21,21 +21,23 @@ namespace bls12_381::scalar {
  */
 class Scalar {
 public:
-    static constexpr int32_t WIDTH = 4;
-    static constexpr int32_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
+    static constexpr size_t WIDTH = 4;
+    static constexpr size_t BYTE_SIZE = WIDTH * sizeof(uint64_t);
 
 private:
     std::array<uint64_t, Scalar::WIDTH> data;
 
 public:
-    Scalar();
+    Scalar() noexcept;
 
-    Scalar(const Scalar &scalar);
-    explicit Scalar(uint64_t val);
-    explicit Scalar(const std::array<uint64_t, Scalar::WIDTH> &data);
+    Scalar(const Scalar &scalar) noexcept;
+    explicit Scalar(uint64_t val) noexcept;
+    explicit Scalar(const std::array<uint64_t, Scalar::WIDTH> &data) noexcept;
 
     Scalar(Scalar &&scalar) noexcept;
-    explicit Scalar(std::array<uint64_t, Scalar::WIDTH> &&data);
+    explicit Scalar(std::array<uint64_t, Scalar::WIDTH> &&data) noexcept;
+
+    ~Scalar() noexcept;
 
     /**
      * @brief Returns zero, the additive identity.

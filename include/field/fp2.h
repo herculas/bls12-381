@@ -22,15 +22,17 @@ private:
     Fp c1;
 
 public:
-    Fp2();
+    Fp2() noexcept;
 
-    Fp2(const Fp2 &fp);
-    explicit Fp2(const Fp &fp);
-    explicit Fp2(const Fp &fp0, const Fp &fp1);
+    Fp2(const Fp2 &fp) noexcept;
+    explicit Fp2(const Fp &fp) noexcept;
+    explicit Fp2(const Fp &fp0, const Fp &fp1) noexcept;
 
     Fp2(Fp2 &&fp) noexcept;
-    explicit Fp2(Fp &&fp);
-    explicit Fp2(Fp &&fp0, Fp &&fp1);
+    explicit Fp2(Fp &&fp) noexcept;
+    explicit Fp2(Fp &&fp0, Fp &&fp1) noexcept;
+
+    ~Fp2() noexcept;
 
     /**
      * @brief Returns zero, the additive identity.

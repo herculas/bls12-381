@@ -20,14 +20,15 @@ G2Affine::G2Affine() : x{Fp2::zero()}, y{Fp2::one()}, infinity{true} {}
 G2Affine::G2Affine(const G2Affine &point) = default;
 
 G2Affine::G2Affine(const G2Projective &point) : x{Fp2::zero()}, y{Fp2::one()}, infinity{true} {
-    Fp2 z_inv = point.get_z().invert().value_or(Fp2::zero());
-    Fp2 rx = point.get_x() * z_inv;
-    Fp2 ry = point.get_y() * z_inv;
-    G2Affine temp{rx, ry, false};
+    Fp2 const z_inv = point.get_z().invert().value_or(Fp2::zero());
+    Fp2 const rx = point.get_x() * z_inv;
+    Fp2 const ry = point.get_y() * z_inv;
+    G2Affine const temp{rx, ry, false};
     if (!z_inv.is_zero()) *this = temp;
 }
 
-G2Affine::G2Affine(const Fp2 &x, const Fp2 &y, bool infinity) : x{x}, y{y}, infinity{infinity} {}
+G2Affine::G2Affine(const Fp2 &x, const Fp2 &y, bool infinity) // NOLINT(bugprone-easily-swappable-parameters)
+        : x{x}, y{y}, infinity{infinity} {}
 
 G2Affine::G2Affine(G2Affine &&point) noexcept = default;
 
@@ -35,11 +36,13 @@ G2Affine::G2Affine(G2Projective &&point) : x{Fp2::zero()}, y{Fp2::one()}, infini
     const Fp2 z_inv = point.get_z().invert().value_or(Fp2::zero());
     const Fp2 rx = point.get_x() * z_inv;
     const Fp2 ry = point.get_y() * z_inv;
-    G2Affine temp{rx, ry, false};
+    G2Affine const temp{rx, ry, false};
     if (!z_inv.is_zero()) *this = temp;
 }
 
 G2Affine::G2Affine(Fp2 &&x, Fp2 &&y, bool infinity) : x{std::move(x)}, y{std::move(y)}, infinity{infinity} {}
+
+G2Affine::~G2Affine() = default;
 
 G2Affine G2Affine::identity() noexcept {
     return G2Affine{};
@@ -240,7 +243,7 @@ auto G2Affine::from_slice_unchecked(const std::vector<uint8_t> &bytes) -> G2Affi
 
     std::array<uint8_t, sizeof(uint64_t)> temp_bytes{};
 
-for (int i = 0; i < G2Affine::RAW_SIZE - 1; i += 8) {
+    for (int i = 0; i < G2Affine::RAW_SIZE - 1; i += 8) {
         const int count = i / 8;
         std::copy(bytes.begin() + i, bytes.begin() + i + 8, temp_bytes.begin());
         if (count < Fp::WIDTH)
@@ -271,10 +274,10 @@ std::array<uint8_t, G2Affine::RAW_SIZE> G2Affine::to_raw_bytes() const {
         const std::array<uint8_t, 8> y0_bytes = to_le_bytes<uint64_t>(this->y.get_c0().get_data()[i]);
         const std::array<uint8_t, 8> y1_bytes = to_le_bytes<uint64_t>(this->y.get_c1().get_data()[i]);
 
-        std::copy(x0_bytes.begin(), x0_bytes.end(), bytes.begin() + i * 8);
-        std::copy(x1_bytes.begin(), x1_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE);
-        std::copy(y0_bytes.begin(), y0_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE * 2);
-        std::copy(y1_bytes.begin(), y1_bytes.end(), bytes.begin() + i * 8 + Fp::BYTE_SIZE * 3);
+        std::copy(x0_bytes.begin(), x0_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8));
+        std::copy(x1_bytes.begin(), x1_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8) + Fp::BYTE_SIZE);
+        std::copy(y0_bytes.begin(), y0_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8) + Fp::BYTE_SIZE * 2);
+        std::copy(y1_bytes.begin(), y1_bytes.end(), bytes.begin() + static_cast<ptrdiff_t>(i * 8) + Fp::BYTE_SIZE * 3);
     }
     bytes[G2Affine::RAW_SIZE - 1] = static_cast<uint8_t>(this->infinity);
     return bytes;

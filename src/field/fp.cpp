@@ -23,17 +23,19 @@ using util::arithmetic::sbb;
 using util::arithmetic::mac;
 using util::encoding::hex_str;
 
-Fp::Fp() : data{0} {}
+Fp::Fp() noexcept: data{0} {}
 
-Fp::Fp(const Fp &fp) = default;
+Fp::Fp(const Fp &fp) noexcept = default;
 
-Fp::Fp(uint64_t val) : data{val} {}
+Fp::Fp(uint64_t val) noexcept: data{val} {}
 
-Fp::Fp(const std::array<uint64_t, Fp::WIDTH> &data) : data{data} {}
+Fp::Fp(const std::array<uint64_t, Fp::WIDTH> &data) noexcept: data{data} {}
 
 Fp::Fp(Fp &&fp) noexcept = default;
 
-Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) : data{data} {}
+Fp::Fp(std::array<uint64_t, Fp::WIDTH> &&data) noexcept: data{data} {}
+
+Fp::~Fp() noexcept = default;
 
 Fp Fp::zero() noexcept {
     return Fp{};
@@ -60,7 +62,6 @@ Fp Fp::random(RngCore &rng) {
 }
 
 Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
-    uint64_t k;
     uint64_t carry = 0;
 
     std::array<uint64_t, Fp::WIDTH * 2> r{};
@@ -68,7 +69,7 @@ Fp Fp::montgomery_reduce(const std::array<uint64_t, Fp::WIDTH * 2> &ts) {
         r[i] = i < Fp::WIDTH ? ts[i] : 0;
 
     for (int i = 0; i < Fp::WIDTH; ++i) {
-        k = r[i] * constant::INV;
+        const uint64_t k = r[i] * constant::INV;
         carry = 0;
         r[0] = mac(r[i], k, constant::MODULUS[0], carry);
         for (int j = 1; j < Fp::WIDTH; ++j)
@@ -89,7 +90,7 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
 
     for (int j = 0; j < Fp::WIDTH; ++j) {
         uint64_t t[Fp::WIDTH + 1] = {0};
-        std::copy(u, u + Fp::WIDTH, t);
+        std::copy(u, u + Fp::WIDTH, t); // NOLINT
         for (int i = 0; i < len; ++i) {
             carry = 0;
             for (int k = 0; k < Fp::WIDTH; ++k)
@@ -98,7 +99,7 @@ Fp Fp::sum_of_products(const std::vector<Fp> &a, const std::vector<Fp> &b) {
         }
 
         uint64_t r[Fp::WIDTH + 1] = {0};
-        uint64_t k = t[0] * constant::INV;
+        const uint64_t k = t[0] * constant::INV;
         carry = 0;
         mac(t[0], k, constant::MODULUS[0], carry);
 
@@ -157,7 +158,7 @@ bool Fp::lexicographically_largest() const {
 
     const Fp temp = Fp::montgomery_reduce(contents);
 
-    uint64_t subs[WIDTH] = {
+    const uint64_t subs[WIDTH] = {
             0xdcff7fffffffd556, 0x0f55ffff58a9ffff, 0xb39869507b587b12,
             0xb23ba5c279c2895f, 0x258dd3db21a5d66b, 0x0d0088f51cbff34d
     };
@@ -210,7 +211,7 @@ Fp Fp::square() const {
     for (int i = 0; i < Fp::WIDTH - 1; ++i) {
         carry = 0;
         for (int j = 0; j < Fp::WIDTH - i - 2; ++j) {
-            int32_t anchor = i * 2 + j + 1;
+            const int32_t anchor = i * 2 + j + 1;
             temp[anchor] = mac(temp[anchor], this->data[i], this->data[i + j + 1], carry);
         }
         temp[i + Fp::WIDTH - 1] = mac(temp[i + Fp::WIDTH - 1], this->data[i],
@@ -353,8 +354,9 @@ Fp Fp::operator-() const {
     for (int i = 0; i < Fp::WIDTH; ++i)
         d[i] = sbb(constant::MODULUS[i], this->data[i], borrow);
 
-    bool dec = (this->data[0] | this->data[1] | this->data[2] | this->data[3] | this->data[4] | this->data[5]) == 0;
-    uint64_t mask = static_cast<uint64_t>(dec) - 1;
+    const bool dec =
+            (this->data[0] | this->data[1] | this->data[2] | this->data[3] | this->data[4] | this->data[5]) == 0;
+    const uint64_t mask = static_cast<uint64_t>(dec) - 1;
 
     return Fp(
             {

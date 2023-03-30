@@ -6,7 +6,7 @@ using bls12_381::field::Fp2;
 using bls12_381::field::Fp6;
 
 TEST(TestFp6, Arithmetic) {
-    Fp6 a{
+    Fp6 const a{
             Fp2{
                     Fp({
                                0x47f9cb98b1b82d58, 0x5fe911eba3aa1d9d, 0x96bf1b5f4dd81db3,
@@ -111,6 +111,6 @@ TEST(TestFp6, Arithmetic) {
 
     EXPECT_EQ((a + b) * c.square(), (c * c * a) + (c * c * b));
 
-    EXPECT_EQ(a.invert().value() * b.invert().value(), (a * b).invert().value());
-    EXPECT_EQ(a.invert().value() * a, Fp6::one());
+    EXPECT_EQ(a.invert().value() * b.invert().value(), (a * b).invert().value()); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(a.invert().value() * a, Fp6::one()); // NOLINT(bugprone-unchecked-optional-access)
 }

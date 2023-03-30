@@ -4,23 +4,25 @@ namespace bls12_381::field {
 
 using rng::core::RngCore;
 
-Fp6::Fp6() : c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6() noexcept: c0{Fp2::zero()}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(const Fp6 &fp) = default;
+Fp6::Fp6(const Fp6 &fp) noexcept = default;
 
-Fp6::Fp6(const Fp &fp) : c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp &fp) noexcept: c0{Fp2(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(const Fp2 &fp) : c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(const Fp2 &fp) noexcept: c0{fp}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2) : c0{fp0}, c1{fp1}, c2{fp2} {}
+Fp6::Fp6(const Fp2 &fp0, const Fp2 &fp1, const Fp2 &fp2) noexcept: c0{fp0}, c1{fp1}, c2{fp2} {}
 
 Fp6::Fp6(Fp6 &&fp) noexcept = default;
 
-Fp6::Fp6(Fp &&fp) : c0{Fp2{fp}}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(Fp &&fp) noexcept: c0{Fp2{fp}}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp2 &&fp) : c0{std::move(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
+Fp6::Fp6(Fp2 &&fp) noexcept: c0{std::move(fp)}, c1{Fp2::zero()}, c2{Fp2::zero()} {}
 
-Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) : c0{std::move(fp0)}, c1{std::move(fp1)}, c2{std::move(fp2)} {}
+Fp6::Fp6(Fp2 &&fp0, Fp2 &&fp1, Fp2 &&fp2) noexcept: c0{std::move(fp0)}, c1{std::move(fp1)}, c2{std::move(fp2)} {}
+
+Fp6::~Fp6() noexcept = default;
 
 Fp6 Fp6::zero() noexcept {
     return Fp6{
@@ -90,9 +92,9 @@ Fp6 Fp6::mul_by_fp2(const Fp2 &fp0, const Fp2 &fp1) const {
     const Fp2 a_a = this->c0 * fp0;
     const Fp2 b_b = this->c1 * fp1;
 
-    Fp2 t1 = (this->c2 * fp1).mul_by_non_residue() + a_a;
-    Fp2 t2 = (fp0 + fp1) * (this->c0 + this->c1) - a_a - b_b;
-    Fp2 t3 = this->c2 * fp0 + b_b;
+    Fp2 const t1 = (this->c2 * fp1).mul_by_non_residue() + a_a;
+    Fp2 const t2 = (fp0 + fp1) * (this->c0 + this->c1) - a_a - b_b;
+    Fp2 const t3 = this->c2 * fp0 + b_b;
 
     return Fp6{t1, t2, t3};
 }
@@ -136,7 +138,7 @@ Fp6 Fp6::mul_interleaved(const Fp6 &b) const {
 }
 
 Fp6 Fp6::frobenius_map() const {
-    Fp2 fp0 = this->c0.frobenius_map();
+    Fp2 const fp0 = this->c0.frobenius_map();
     Fp2 fp1 = this->c1.frobenius_map();
     Fp2 fp2 = this->c2.frobenius_map();
 

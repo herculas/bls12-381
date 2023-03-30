@@ -27,10 +27,12 @@ G2Prepared::G2Prepared(bool infinity, coeff_vec coefficients)
         : infinity{infinity}, coefficients{std::move(coefficients)} {}
 
 struct Helper : MillerLoopDriver<void> {
+private:
     G2Projective current;
     G2Affine base;
     coeff_vec coefficients;
 
+public:
     Helper(G2Projective current, G2Affine base, coeff_vec coefficients)
             : current{std::move(current)}, base{std::move(base)}, coefficients{std::move(coefficients)} {}
 
@@ -49,30 +51,34 @@ struct Helper : MillerLoopDriver<void> {
     void conjugate() override {}
 
     void one() override {}
+
+    [[nodiscard]] const coeff_vec &get_coefficients() const {
+        return coefficients;
+    }
 };
 
 G2Prepared::G2Prepared(const G2Affine &point) : infinity{}, coefficients{} {
-    bool is_identity = point.is_identity();
-    G2Affine q = (is_identity) ? G2Affine::generator() : point;
+    bool const is_identity = point.is_identity();
+    G2Affine const q = (is_identity) ? G2Affine::generator() : point;
     coeff_vec coeffs_temp;
     coeffs_temp.reserve(68);
     Helper helper{G2Projective{q}, q, coeffs_temp};
     pairing::miller_loop(helper);
 
-    assert(helper.coefficients.size() == 68);
-    *this = G2Prepared{is_identity, helper.coefficients};
+    assert(helper.get_coefficients().size() == 68);
+    *this = G2Prepared{is_identity, helper.get_coefficients()};
 }
 
 G2Prepared::G2Prepared(G2Affine &&point) : infinity{}, coefficients{} {
-    bool is_identity = point.is_identity();
-    G2Affine q = (is_identity) ? G2Affine::generator() : point;
+    bool const is_identity = point.is_identity();
+    G2Affine const q = (is_identity) ? G2Affine::generator() : point;
     coeff_vec coeffs_temp;
     coeffs_temp.reserve(68);
     Helper helper{G2Projective{q}, q, coeffs_temp};
     pairing::miller_loop(helper);
 
-    assert(helper.coefficients.size() == 68);
-    *this = G2Prepared{is_identity, helper.coefficients};
+    assert(helper.get_coefficients().size() == 68);
+    *this = G2Prepared{is_identity, helper.get_coefficients()};
 }
 
 bool G2Prepared::is_identity() const {
@@ -104,12 +110,12 @@ auto G2Prepared::from_slice_unchecked(const std::vector<uint8_t> &bytes) -> G2Pr
             std::array<uint8_t, 8> c_c0_bytes{};
             std::array<uint8_t, 8> c_c1_bytes{};
 
-            std::copy(bytes.begin() + i + j * 48, bytes.begin() + i + j * 48 + 8, a_c0_bytes.begin());
-            std::copy(bytes.begin() + i + j * 48 + 8, bytes.begin() + i + j * 48 + 16, a_c1_bytes.begin());
-            std::copy(bytes.begin() + i + j * 48 + 16, bytes.begin() + i + j * 48 + 24, b_c0_bytes.begin());
-            std::copy(bytes.begin() + i + j * 48 + 24, bytes.begin() + i + j * 48 + 32, b_c1_bytes.begin());
-            std::copy(bytes.begin() + i + j * 48 + 32, bytes.begin() + i + j * 48 + 40, c_c0_bytes.begin());
-            std::copy(bytes.begin() + i + j * 48 + 40, bytes.begin() + i + j * 48 + 48, c_c1_bytes.begin());
+            std::copy(bytes.begin() + i + j * 48, bytes.begin() + i + j * 48 + 8, a_c0_bytes.begin()); // NOLINT
+            std::copy(bytes.begin() + i + j * 48 + 8, bytes.begin() + i + j * 48 + 16, a_c1_bytes.begin()); // NOLINT
+            std::copy(bytes.begin() + i + j * 48 + 16, bytes.begin() + i + j * 48 + 24, b_c0_bytes.begin()); // NOLINT
+            std::copy(bytes.begin() + i + j * 48 + 24, bytes.begin() + i + j * 48 + 32, b_c1_bytes.begin()); // NOLINT
+            std::copy(bytes.begin() + i + j * 48 + 32, bytes.begin() + i + j * 48 + 40, c_c0_bytes.begin()); // NOLINT
+            std::copy(bytes.begin() + i + j * 48 + 40, bytes.begin() + i + j * 48 + 48, c_c1_bytes.begin()); // NOLINT
 
             a_c0_data[j] = from_le_bytes<uint64_t>(a_c0_bytes);
             a_c1_data[j] = from_le_bytes<uint64_t>(a_c1_bytes);
@@ -119,12 +125,10 @@ auto G2Prepared::from_slice_unchecked(const std::vector<uint8_t> &bytes) -> G2Pr
             c_c1_data[j] = from_le_bytes<uint64_t>(c_c1_bytes);
         }
 
-        coeffs.push_back(
-                {
-                        Fp2{Fp{a_c0_data}, Fp{a_c1_data}},
-                        Fp2{Fp{b_c0_data}, Fp{b_c1_data}},
-                        Fp2{Fp{c_c0_data}, Fp{c_c1_data}}
-                }
+        coeffs.emplace_back(
+                Fp2{Fp{a_c0_data}, Fp{a_c1_data}},
+                Fp2{Fp{b_c0_data}, Fp{b_c1_data}},
+                Fp2{Fp{c_c0_data}, Fp{c_c1_data}}
         );
     }
     return G2Prepared{false, coeffs};
@@ -157,4 +161,3 @@ std::vector<uint8_t> G2Prepared::to_raw_bytes() const {
 }
 
 } // namespace bls12_381::group
-

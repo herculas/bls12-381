@@ -11,7 +11,7 @@ using bls12_381::group::G1Projective;
 using bls12_381::scalar::Scalar;
 
 TEST(G1, Beta) {
-    auto a = Fp::from_bytes({
+    auto a = Fp::from_bytes({ // NOLINT(bugprone-unchecked-optional-access)
                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                     0x5f, 0x19, 0x67, 0x2f, 0xdf, 0x76, 0xce, 0x51,
                                     0xba, 0x69, 0xc6, 0x07, 0x6a, 0x0f, 0x77, 0xea,
@@ -32,21 +32,21 @@ TEST(G1, OnCurve) {
     EXPECT_TRUE(G1Projective::identity().is_on_curve());
     EXPECT_TRUE(G1Projective::generator().is_on_curve());
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
-    G1Affine gen = G1Affine::generator();
-    G1Projective test1{gen.get_x() * z, gen.get_y() * z, z};
-    G1Projective test2{z, gen.get_y() * z, z};
+    G1Affine const gen = G1Affine::generator();
+    G1Projective const test1{gen.get_x() * z, gen.get_y() * z, z};
+    G1Projective const test2{z, gen.get_y() * z, z};
 
     EXPECT_TRUE(test1.is_on_curve());
     EXPECT_FALSE(test2.is_on_curve());
 }
 
 TEST(G1, AffineEquality) {
-    G1Affine a = G1Affine::generator();
-    G1Affine b = G1Affine::identity();
+    G1Affine const a = G1Affine::generator();
+    G1Affine const b = G1Affine::identity();
 
     EXPECT_TRUE(a == a);
     EXPECT_TRUE(b == b);
@@ -55,21 +55,21 @@ TEST(G1, AffineEquality) {
 }
 
 TEST(G1, ProjectiveEquality) {
-    G1Projective a = G1Projective::generator();
-    G1Projective b = G1Projective::identity();
+    G1Projective const a = G1Projective::generator();
+    G1Projective const b = G1Projective::identity();
 
     EXPECT_TRUE(a == a);
     EXPECT_TRUE(b == b);
     EXPECT_TRUE(a != b);
     EXPECT_TRUE(b != a);
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
-    G1Projective p1{a.get_x() * z, a.get_y() * z, z};
-    G1Projective p2{a.get_x() * z, -a.get_y() * z, z};
-    G1Projective p3{z, a.get_y() * z, z};
+    G1Projective const p1{a.get_x() * z, a.get_y() * z, z};
+    G1Projective const p2{a.get_x() * z, -a.get_y() * z, z};
+    G1Projective const p3{z, a.get_y() * z, z};
 
     EXPECT_TRUE(p1.is_on_curve());
     EXPECT_TRUE(p2.is_on_curve());
@@ -92,8 +92,8 @@ TEST(G1, ProjectiveEquality) {
 }
 
 TEST(G1, ProjectiveToAffine) {
-    G1Projective a = G1Projective::generator();
-    G1Projective b = G1Projective::identity();
+    G1Projective const a = G1Projective::generator();
+    G1Projective const b = G1Projective::identity();
 
     EXPECT_TRUE(G1Affine(a).is_on_curve());
     EXPECT_FALSE(G1Affine(a).is_identity());
@@ -102,15 +102,15 @@ TEST(G1, ProjectiveToAffine) {
 }
 
 TEST(G1, Doubleing) {
-    G1Projective temp1 = G1Projective::identity().doubles();
-    G1Projective temp2 = G1Projective::generator().doubles();
+    G1Projective const temp1 = G1Projective::identity().doubles();
+    G1Projective const temp2 = G1Projective::generator().doubles();
 
     EXPECT_TRUE(temp1.is_identity());
     EXPECT_TRUE(temp1.is_on_curve());
     EXPECT_FALSE(temp2.is_identity());
     EXPECT_TRUE(temp2.is_on_curve());
 
-    G1Affine temp3{
+    G1Affine const temp3{
             Fp({
                        0x53e978ce58a9ba3c, 0x3ea0583c4f3d65f9, 0x4d20bb47f0012960,
                        0xa54c664ae5b2b5d9, 0x26b552a39d7eb21f, 0x0008895d26e68785,
@@ -126,24 +126,24 @@ TEST(G1, Doubleing) {
 }
 
 TEST(G1, Add1) {
-    G1Projective a = G1Projective::identity();
-    G1Projective b = G1Projective::identity();
-    G1Projective c = a + b;
+    G1Projective const a = G1Projective::identity();
+    G1Projective const b = G1Projective::identity();
+    G1Projective const c = a + b;
 
     EXPECT_TRUE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
 }
 
 TEST(G1, Add2) {
-    G1Projective a = G1Projective::identity();
+    G1Projective const a = G1Projective::identity();
     G1Projective b = G1Projective::generator();
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
     b = G1Projective{b.get_x() * z, b.get_y() * z, z};
-    G1Projective c = a + b;
+    G1Projective const c = a + b;
 
     EXPECT_FALSE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
@@ -151,15 +151,15 @@ TEST(G1, Add2) {
 }
 
 TEST(G1, Add3) {
-    G1Projective a = G1Projective::identity();
+    G1Projective const a = G1Projective::identity();
     G1Projective b = G1Projective::generator();
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
     b = G1Projective{b.get_x() * z, b.get_y() * z, z};
-    G1Projective c = b + a;
+    G1Projective const c = b + a;
 
     EXPECT_FALSE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
@@ -167,9 +167,9 @@ TEST(G1, Add3) {
 }
 
 TEST(G1, Add4) {
-    G1Projective a = G1Projective::generator().doubles().doubles();
-    G1Projective b = G1Projective::generator().doubles();
-    G1Projective c = a + b;
+    G1Projective const a = G1Projective::generator().doubles().doubles();
+    G1Projective const b = G1Projective::generator().doubles();
+    G1Projective const c = a + b;
     G1Projective d = G1Projective::generator();
     for (int i = 0; i < 5; ++i) d += G1Projective::generator();
 
@@ -187,14 +187,14 @@ TEST(G1, Add5) {
             });
     beta = beta.square();
 
-    G1Projective a = G1Projective::generator().doubles().doubles();
-    G1Projective b{a.get_x() * beta, -a.get_y(), a.get_z()};
+    G1Projective const a = G1Projective::generator().doubles().doubles();
+    G1Projective const b{a.get_x() * beta, -a.get_y(), a.get_z()};
 
     EXPECT_TRUE(a.is_on_curve());
     EXPECT_TRUE(b.is_on_curve());
 
-    G1Projective c = a + b;
-    G1Projective d{
+    G1Projective const c = a + b;
+    G1Projective const d{
             Fp({
                        0x29e1e987ef68f2d0, 0xc5f3ec531db03233, 0xacd6c4b6ca19730f,
                        0x18ad9e827bc2bab7, 0x46e3b2c5785cc7a9, 0x07e571d42d22ddd6,
@@ -212,24 +212,24 @@ TEST(G1, Add5) {
 }
 
 TEST(G1, MixAdd1) {
-    G1Affine a = G1Affine::identity();
-    G1Projective b = G1Projective::identity();
-    G1Projective c = a + b;
+    G1Affine const a = G1Affine::identity();
+    G1Projective const b = G1Projective::identity();
+    G1Projective const c = a + b;
 
     EXPECT_TRUE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
 }
 
 TEST(G1, MixAdd2) {
-    G1Affine a = G1Affine::identity();
+    G1Affine const a = G1Affine::identity();
     G1Projective b = G1Projective::generator();
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
     b = G1Projective{b.get_x() * z, b.get_y() * z, z};
-    G1Projective c = a + b;
+    G1Projective const c = a + b;
 
     EXPECT_FALSE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
@@ -237,15 +237,15 @@ TEST(G1, MixAdd2) {
 }
 
 TEST(G1, MixAdd3) {
-    G1Affine a = G1Affine::identity();
+    G1Affine const a = G1Affine::identity();
     G1Projective b = G1Projective::generator();
 
-    Fp z({
+    Fp const z({
                  0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
                  0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e,
          });
     b = G1Projective{b.get_x() * z, b.get_y() * z, z};
-    G1Projective c = b + a;
+    G1Projective const c = b + a;
 
     EXPECT_FALSE(c.is_identity());
     EXPECT_TRUE(c.is_on_curve());
@@ -253,9 +253,9 @@ TEST(G1, MixAdd3) {
 }
 
 TEST(G1, MixAdd4) {
-    G1Projective a = G1Projective::generator().doubles().doubles();
-    G1Projective b = G1Projective::generator().doubles();
-    G1Projective c = a + b;
+    G1Projective const a = G1Projective::generator().doubles().doubles();
+    G1Projective const b = G1Projective::generator().doubles();
+    G1Projective const c = a + b;
     G1Projective d = G1Projective::generator();
     for (int i = 0; i < 5; ++i) d += G1Affine::generator();
 
@@ -273,16 +273,16 @@ TEST(G1, MixAdd5) {
             });
     beta = beta.square();
 
-    G1Projective a = G1Projective::generator().doubles().doubles();
-    G1Projective b{a.get_x() * beta, -a.get_y(), a.get_z()};
+    G1Projective const a = G1Projective::generator().doubles().doubles();
+    G1Projective const b{a.get_x() * beta, -a.get_y(), a.get_z()};
 
-    G1Affine aa(a);
+    G1Affine const aa(a);
 
     EXPECT_TRUE(aa.is_on_curve());
     EXPECT_TRUE(b.is_on_curve());
 
-    G1Projective c = aa + b;
-    G1Projective d{
+    G1Projective const c = aa + b;
+    G1Projective const d{
             Fp({
                        0x29e1e987ef68f2d0, 0xc5f3ec531db03233, 0xacd6c4b6ca19730f,
                        0x18ad9e827bc2bab7, 0x46e3b2c5785cc7a9, 0x07e571d42d22ddd6,
@@ -300,32 +300,32 @@ TEST(G1, MixAdd5) {
 }
 
 TEST(G1, ProjectiveNegSub) {
-    G1Projective a = G1Projective::generator().doubles();
+    G1Projective const a = G1Projective::generator().doubles();
 
     EXPECT_EQ(a + (-a), G1Projective::identity());
     EXPECT_EQ(a + (-a), a - a);
 }
 
 TEST(G1, AffineNegSub) {
-    G1Affine a = G1Affine::generator();
+    G1Affine const a = G1Affine::generator();
 
     EXPECT_EQ(G1Projective(a) +(-a), G1Projective::identity());
     EXPECT_EQ(G1Projective(a) +(-a), G1Projective(a) -a);
 }
 
 TEST(G1, AffineScalarMul) {
-    G1Affine gen = G1Affine::generator();
-    Scalar a = Scalar::from_raw(
+    G1Affine const gen = G1Affine::generator();
+    Scalar const a = Scalar::from_raw(
             {0x2b568297a56da71c, 0xd8c39ecb0ef375d1, 0x435c38da67bfbf96, 0x8088a05026b659b2});
-    Scalar b = Scalar::from_raw(
+    Scalar const b = Scalar::from_raw(
             {0x785fdd9b26ef8b85, 0xc997f25837695c18, 0x4c8dbc39e7b756c1, 0x70d9b6cc6d87df20});
-    Scalar c = a * b;
+    Scalar const c = a * b;
 
     EXPECT_EQ(G1Affine(gen * a) * b, gen * c);
 }
 
 TEST(G1, TorsionFree) {
-    G1Affine a{
+    G1Affine const a{
             Fp({
                        0x0abaf895b97e43c8, 0xba4c6432eb9b61b0, 0x12506f52adfe307f,
                        0x75028c3439336b72, 0x84744f05b8e9bd71, 0x113d554fb09554f7,
@@ -343,30 +343,30 @@ TEST(G1, TorsionFree) {
 }
 
 TEST(G1, MulByX) {
-    G1Projective gen = G1Projective::generator();
-    Scalar x = -Scalar(bls12_381::group::constant::BLS_X);
+    G1Projective const gen = G1Projective::generator();
+    Scalar const x = -Scalar(bls12_381::group::constant::BLS_X);
 
     auto ta = gen * x;
     auto tb = gen.mul_by_x();
 
     EXPECT_EQ(gen.mul_by_x(), gen * x);
-    G1Projective point = G1Projective::generator() * Scalar(42);
+    G1Projective const point = G1Projective::generator() * Scalar(42);
     EXPECT_EQ(point.mul_by_x(), point * x);
 }
 
 TEST(G1, CofactorClearance) {
-    G1Projective gen = G1Projective::generator();
-    G1Projective id = G1Projective::identity();
+    G1Projective const gen = G1Projective::generator();
+    G1Projective const id = G1Projective::identity();
 
     EXPECT_TRUE(gen.clear_cofactor().is_on_curve());
     EXPECT_TRUE(id.clear_cofactor().is_on_curve());
 
-    Fp z({
+    Fp const z({
                  0x3d2d1c670671394e, 0x0ee3a800a2f7c1ca, 0x270f4f21da2e5050,
                  0xe02840a53f1be768, 0x55debeb597512690, 0x08bd25353dc8f791,
          });
 
-    G1Projective point{
+    G1Projective const point{
             Fp({
                        0x48af5ff540c817f0, 0xd73893acaf379d5a, 0xe6c43584e18e023c,
                        0x1eda39c30f188b3e, 0xf618c6d3ccc0f8d8, 0x0073542cd671e16c,
@@ -381,20 +381,20 @@ TEST(G1, CofactorClearance) {
     EXPECT_TRUE(point.is_on_curve());
     EXPECT_FALSE(G1Affine(point).is_torsion_free());
 
-    G1Projective cleared = point.clear_cofactor();
+    G1Projective const cleared = point.clear_cofactor();
 
     EXPECT_TRUE(cleared.is_on_curve());
     EXPECT_TRUE(G1Affine(cleared).is_torsion_free());
 
-    Scalar h_eff =
+    Scalar const h_eff =
             Scalar(1) + Scalar(bls12_381::group::constant::BLS_X);
     EXPECT_EQ(point.clear_cofactor(), h_eff * point);
 }
 
 TEST(G1, BatchNormalize) {
-    G1Projective a = G1Projective::generator().doubles();
-    G1Projective b = a.doubles();
-    G1Projective c = b.doubles();
+    G1Projective const a = G1Projective::generator().doubles();
+    G1Projective const b = a.doubles();
+    G1Projective const c = b.doubles();
 
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 2; ++j) {
@@ -405,7 +405,7 @@ TEST(G1, BatchNormalize) {
                 if (k == 0) v[2] = G1Projective::identity();
 
                 std::vector<G1Affine> res = G1Projective::batch_normalize(v);
-                G1Affine expected[3] = {G1Affine(v[0]),
+                G1Affine const expected[3] = {G1Affine(v[0]),
                                         G1Affine(v[1]),
                                         G1Affine(v[2])};
 
@@ -418,10 +418,10 @@ TEST(G1, BatchNormalize) {
 }
 
 TEST(G1, CommutativeScalarSubgroupMul) {
-    Scalar a = Scalar::from_raw(
+    Scalar const a = Scalar::from_raw(
             {0x1fff3231233ffffd, 0x4884b7fa00034802, 0x998c4fefecbc4ff3, 0x1824b159acc50562});
-    G1Affine g1_a = G1Affine::generator();
-    G1Projective g1_p = G1Projective::generator();
+    G1Affine const g1_a = G1Affine::generator();
+    G1Projective const g1_p = G1Projective::generator();
 
     // commutative
     EXPECT_EQ(g1_a * a, a * g1_a);

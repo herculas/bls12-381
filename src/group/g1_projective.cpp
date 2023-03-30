@@ -25,7 +25,8 @@ G1Projective::G1Projective(const G1Projective &point) = default;
 G1Projective::G1Projective(const G1Affine &point)
         : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
-G1Projective::G1Projective(const Fp &x, const Fp &y, const Fp &z) : x{x}, y{y}, z{z} {}
+G1Projective::G1Projective(const Fp &x, const Fp &y, const Fp &z)  // NOLINT(bugprone-easily-swappable-parameters)
+        : x{x}, y{y}, z{z} {}
 
 G1Projective::G1Projective(G1Projective &&point) noexcept = default;
 
@@ -33,6 +34,8 @@ G1Projective::G1Projective(G1Affine &&point)
         : x{point.get_x()}, y{point.get_y()}, z{point.is_identity() ? Fp::zero() : Fp::one()} {}
 
 G1Projective::G1Projective(Fp &&x, Fp &&y, Fp &&z) : x{std::move(x)}, y{std::move(y)}, z{std::move(z)} {}
+
+G1Projective::~G1Projective() = default;
 
 G1Projective G1Projective::identity() noexcept {
     return G1Projective{};
@@ -80,9 +83,9 @@ std::vector<G1Affine> G1Projective::batch_normalize(const std::vector<G1Projecti
     acc = acc.invert().value();
 
     for (int i = static_cast<int32_t>(points.size()) - 1; i >= 0; --i) {
-        Fp temp = temp_xs[i] * acc;
+        Fp const temp = temp_xs[i] * acc;
         acc = points[i].is_identity() ? acc : (acc * points[i].z);
-        G1Affine r{
+        G1Affine const r{
                 points[i].x * temp,
                 points[i].y * temp,
                 false,
@@ -142,7 +145,7 @@ G1Projective G1Projective::doubles() const {
     x3 = t0 * t1;
     x3 = x3 + x3;
 
-    G1Projective temp{x3, y3, z3};
+    G1Projective const temp{x3, y3, z3};
     return this->is_identity() ? G1Projective::identity() : temp;
 }
 
@@ -212,7 +215,7 @@ G1Projective G1Projective::add_mixed(const G1Affine &rhs) const {
     z3 = z3 * t4;
     z3 = z3 + t0;
 
-    G1Projective temp{x3, y3, z3};
+    G1Projective const temp{x3, y3, z3};
     return rhs.is_identity() ? *this : temp;
 }
 
@@ -239,7 +242,7 @@ G1Projective G1Projective::multiply(const std::array<uint8_t, 32> &bytes) const 
     for (auto iter = bytes.rbegin(); iter != bytes.rend(); ++iter) {
         for (int i = 7; i >= 0; --i) {
             if (iter == bytes.rbegin() && i == 7) continue;
-            uint8_t bit = (*iter >> i) & static_cast<uint8_t>(1);
+            uint8_t const bit = (*iter >> i) & static_cast<uint8_t>(1);
             acc = acc.doubles();
             if (bit != 0) acc = acc + *this;
         }

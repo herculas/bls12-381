@@ -8,19 +8,21 @@ namespace bls12_381::field {
 
 using rng::core::RngCore;
 
-Fp2::Fp2() : c0{Fp::zero()}, c1{Fp::zero()} {}
+Fp2::Fp2() noexcept: c0{Fp::zero()}, c1{Fp::zero()} {}
 
-Fp2::Fp2(const Fp2 &fp) = default;
+Fp2::Fp2(const Fp2 &fp) noexcept = default;
 
-Fp2::Fp2(const Fp &fp) : c0{fp}, c1{Fp::zero()} {}
+Fp2::Fp2(const Fp &fp) noexcept: c0{fp}, c1{Fp::zero()} {}
 
-Fp2::Fp2(const Fp &fp0, const Fp &fp1) : c0{fp0}, c1{fp1} {}
+Fp2::Fp2(const Fp &fp0, const Fp &fp1) noexcept: c0{fp0}, c1{fp1} {}
 
 Fp2::Fp2(Fp2 &&fp) noexcept = default;
 
-Fp2::Fp2(Fp &&fp) : c0{std::move(fp)}, c1{Fp::zero()} {}
+Fp2::Fp2(Fp &&fp) noexcept: c0{std::move(fp)}, c1{Fp::zero()} {}
 
-Fp2::Fp2(Fp &&fp0, Fp &&fp1) : c0{std::move(fp0)}, c1{std::move(fp1)} {}
+Fp2::Fp2(Fp &&fp0, Fp &&fp1) noexcept: c0{std::move(fp0)}, c1{std::move(fp1)} {}
+
+Fp2::~Fp2() noexcept = default;
 
 Fp2 Fp2::zero() noexcept {
     return Fp2{

@@ -21,19 +21,21 @@ private:
     Fp6 c1;
 
 public:
-    Fp12();
+    Fp12() noexcept;
 
-    Fp12(const Fp12 &fp);
-    explicit Fp12(const Fp &fp);
-    explicit Fp12(const Fp2 &fp);
-    explicit Fp12(const Fp6 &fp);
-    explicit Fp12(const Fp6 &fp0, const Fp6 &fp1);
+    Fp12(const Fp12 &fp) noexcept;
+    explicit Fp12(const Fp &fp) noexcept;
+    explicit Fp12(const Fp2 &fp) noexcept;
+    explicit Fp12(const Fp6 &fp) noexcept;
+    explicit Fp12(const Fp6 &fp0, const Fp6 &fp1) noexcept;
 
     Fp12(Fp12 &&fp) noexcept;
-    explicit Fp12(Fp &&fp);
-    explicit Fp12(Fp2 &&fp);
-    explicit Fp12(Fp6 &&fp);
-    explicit Fp12(Fp6 &&fp0, Fp6 &&fp1);
+    explicit Fp12(Fp &&fp) noexcept;
+    explicit Fp12(Fp2 &&fp) noexcept;
+    explicit Fp12(Fp6 &&fp) noexcept;
+    explicit Fp12(Fp6 &&fp0, Fp6 &&fp1) noexcept;
+
+    ~Fp12() noexcept;
 
     /**
      * @brief Returns zero, the additive identity.

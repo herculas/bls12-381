@@ -22,8 +22,8 @@ T miller_loop(MillerLoopDriver<T> &driver) {
     T f = driver.one();
 
     bool found_one = false;
-    for (int i = 63; i >= 0; --i) {
-        bool bit = (((group::constant::BLS_X >> 1) >> i) & 1) == 1;
+    for (int i = 63; i >= 0; --i) { // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        bool const bit = (((group::constant::BLS_X >> 1) >> i) & 1) == 1;
         if (!found_one) {
             found_one = bit;
             continue;

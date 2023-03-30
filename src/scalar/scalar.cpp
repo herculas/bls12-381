@@ -21,19 +21,21 @@ using util::arithmetic::sbb;
 using util::arithmetic::mac;
 using util::encoding::hex_str;
 
-Scalar::Scalar() : data{0} {}
+Scalar::Scalar() noexcept: data{0} {}
 
-Scalar::Scalar(const Scalar &scalar) = default;
+Scalar::Scalar(const Scalar &scalar) noexcept = default;
 
-Scalar::Scalar(uint64_t val) : data{0} {
+Scalar::Scalar(uint64_t val) noexcept: data{0} {
     *this = Scalar({val, 0, 0, 0}) * constant::R2;
 }
 
-Scalar::Scalar(const std::array<uint64_t, Scalar::WIDTH> &data) : data{data} {}
+Scalar::Scalar(const std::array<uint64_t, Scalar::WIDTH> &data) noexcept: data{data} {}
 
 Scalar::Scalar(Scalar &&scalar) noexcept = default;
 
-Scalar::Scalar(std::array<uint64_t, Scalar::WIDTH> &&data) : data{data} {}
+Scalar::Scalar(std::array<uint64_t, Scalar::WIDTH> &&data) noexcept: data{data} {}
+
+Scalar::~Scalar() noexcept = default;
 
 Scalar Scalar::zero() noexcept {
     return Scalar{};
@@ -43,20 +45,19 @@ Scalar Scalar::one() noexcept {
     return constant::R1;
 }
 
-Scalar Scalar::random(rng::core::RngCore &rng) {
+Scalar Scalar::random(RngCore &rng) {
     std::array<uint8_t, Scalar::BYTE_SIZE * 2> bytes{};
     rng.fill_bytes(bytes);
     return Scalar::from_bytes_wide(bytes);
 }
 
 Scalar Scalar::montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &ts) {
-    uint64_t k;
     uint64_t carry = 0;
     uint64_t carry2 = 0;
 
     std::array<uint64_t, Scalar::WIDTH * 2> r = ts;
     for (int i = 0; i < Scalar::WIDTH; ++i) {
-        k = r[i] * constant::INV;
+        uint64_t const k = r[i] * constant::INV;
         carry = 0;
         mac(r[i], k, constant::MODULUS.data[0], carry);
         for (int j = 1; j < Scalar::WIDTH; ++j)
@@ -64,7 +65,9 @@ Scalar Scalar::montgomery_reduce(const std::array<uint64_t, Scalar::WIDTH * 2> &
         r[i + Scalar::WIDTH] = adc(r[i + Scalar::WIDTH], carry2, carry);
         carry2 = carry;
     }
-    return Scalar({r[4], r[5], r[6], r[7]}).subtract_modulus();
+    return Scalar(
+            {r[4], r[5], r[6], r[7]}
+    ).subtract_modulus();
 }
 
 Scalar Scalar::from_raw(const std::array<uint64_t, Scalar::WIDTH> &values) {
@@ -154,7 +157,7 @@ Scalar Scalar::square() const {
     for (int i = 0; i < Scalar::WIDTH - 1; ++i) {
         carry = 0;
         for (int j = 0; j < Scalar::WIDTH - i - 2; ++j) {
-            int32_t anchor = i * 2 + j + 1;
+            int32_t const anchor = i * 2 + j + 1;
             temp[anchor] = mac(temp[anchor], this->data[i], this->data[i + j + 1], carry);
         }
         temp[i + Scalar::WIDTH - 1] = mac(temp[i + Scalar::WIDTH - 1], this->data[i], this->data[Scalar::WIDTH - 1],
@@ -212,16 +215,16 @@ std::optional<Scalar> Scalar::sqrt() const {
         bool j_less_than_v = true;
 
         for (int j = 2; j < i; ++j) {
-            bool temp_is_one = temp == Scalar::one();
-            Scalar squared = (temp_is_one ? z : temp).square();
+            bool const temp_is_one = temp == Scalar::one();
+            Scalar const squared = (temp_is_one ? z : temp).square();
             temp = temp_is_one ? temp : squared;
-            Scalar new_z = temp_is_one ? squared : z;
+            Scalar const new_z = temp_is_one ? squared : z;
             j_less_than_v &= (j != v);
             k = temp_is_one ? k : j;
             z = j_less_than_v ? new_z : z;
         }
 
-        Scalar res = x * z;
+        Scalar const res = x * z;
         x = (b == Scalar::one()) ? x : res;
         z = z.square();
         b *= z;
@@ -253,14 +256,14 @@ std::optional<Scalar> Scalar::invert() const {
     Scalar t17 = t12.square();
     t1 *= t17;
     Scalar t3 = t7 * t2;
-    Scalar t8 = t1 * t17;
-    Scalar t4 = t8 * t2;
-    Scalar t9 = t8 * t7;
+    Scalar const t8 = t1 * t17;
+    Scalar const t4 = t8 * t2;
+    Scalar const t9 = t8 * t7;
     t7 = t4 * t5;
-    Scalar t11 = t4 * t17;
+    Scalar const t11 = t4 * t17;
     t5 = t9 * t17;
-    Scalar t14 = t7 * t15;
-    Scalar t13 = t11 * t12;
+    Scalar const t14 = t7 * t15;
+    Scalar const t13 = t11 * t12;
     t12 = t11 * t17;
     t15 *= t12;
     t16 *= t15;

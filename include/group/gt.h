@@ -26,6 +26,8 @@ public:
     Gt(Gt &&point) noexcept;
     explicit Gt(field::Fp12 &&point);
 
+    ~Gt();
+
     /**
      * @brief Returns the identity element of Gt.
      * @return The identity element of Gt.
